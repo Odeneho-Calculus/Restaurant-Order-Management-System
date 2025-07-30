@@ -1,0 +1,24 @@
+id,name,category,price,description,is_available
+menu_001,Caesar Salad,appetizers,12.99,Fresh romaine lettuce with parmesan cheese and croutons,True
+menu_002,Buffalo Wings,appetizers,14.99,Spicy chicken wings served with blue cheese dip,True
+menu_003,Mozzarella Sticks,appetizers,9.99,Golden fried mozzarella with marinara sauce,True
+menu_004,Spinach Artichoke Dip,appetizers,11.99,Creamy spinach and artichoke dip with tortilla chips,True
+menu_005,Tomato Basil Soup,soups,8.99,Fresh tomato soup with basil and cream,True
+menu_006,Grilled Chicken Breast,mains,22.99,Herb-seasoned grilled chicken with seasonal vegetables,True
+menu_007,Ribeye Steak,mains,32.99,12oz prime ribeye steak cooked to perfection,True
+menu_008,Salmon Fillet,mains,26.99,Atlantic salmon with lemon butter sauce,True
+menu_009,Pasta Alfredo,mains,18.99,Fettuccine pasta in creamy alfredo sauce,True
+menu_010,BBQ Ribs,mains,28.99,Fall-off-the-bone pork ribs with BBQ sauce,True
+menu_011,Margherita Pizza,mains,16.99,Classic pizza with fresh mozzarella and basil,True
+menu_012,Chicken Parmesan,mains,21.99,Breaded chicken breast with marinara and mozzarella,True
+menu_013,Fish and Chips,mains,19.99,Beer-battered cod with french fries,True
+menu_014,Chocolate Lava Cake,desserts,8.99,Warm chocolate cake with molten center,True
+menu_015,Tiramisu,desserts,7.99,Classic Italian dessert with coffee and mascarpone,True
+menu_016,New York Cheesecake,desserts,6.99,Rich and creamy cheesecake with berry compote,True
+menu_017,Ice Cream Sundae,desserts,5.99,Vanilla ice cream with chocolate sauce and whipped cream,True
+menu_018,Coca Cola,beverages,2.99,Classic cola soft drink,True
+menu_019,Fresh Orange Juice,beverages,4.99,Freshly squeezed orange juice,True
+menu_020,Coffee,beverages,3.49,Freshly brewed coffee,True
+menu_021,Iced Tea,beverages,2.79,Refreshing iced tea with lemon,True
+menu_022,Red Wine,beverages,8.99,House red wine by the glass,True
+menu_023,Beer,beverages,4.99,Draft beer selection,True

@@ -1,0 +1,36 @@
+# Restaurant Order Management System - Requirements
+#
+# This system is built using only Python standard library modules,
+# ensuring maximum compatibility and minimal dependencies.
+#
+# Python version requirement: 3.8 or higher
+#
+# Standard library modules used:
+# - tkinter (GUI framework)
+# - csv (data persistence)
+# - datetime (timestamp handling)
+# - decimal (precise monetary calculations)
+# - pathlib (cross-platform file paths)
+# - logging (application logging)
+# - uuid (unique identifier generation)
+# - json (data serialization)
+# - shutil (file operations)
+# - re (regular expressions for validation)
+# - os (operating system interface)
+# - sys (system-specific parameters)
+# - typing (type hints for better code quality)
+# - enum (enumerated constants)
+
+# No external dependencies required!
+# All functionality is implemented using Python's built-in modules.
+
+# Optional development tools (not required for running the application):
+# pytest>=6.0.0        # For unit testing
+# black>=21.0.0         # For code formatting
+# flake8>=3.8.0         # For code linting
+# mypy>=0.800           # For static type checking
+
+# For enhanced features in future versions (currently not used):
+# matplotlib>=3.3.0     # For advanced charts and graphs
+# pillow>=8.0.0         # For image processing
+# reportlab>=3.5.0      # For PDF generation

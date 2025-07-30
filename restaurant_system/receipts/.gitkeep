@@ -1,0 +1,2 @@
+# This file ensures the receipts directory is included in Git
+# Generated receipts will be saved here but are ignored by .gitignore
