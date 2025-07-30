@@ -21,8 +21,8 @@ start_restaurant_system.bat
 ### Option 2: Cross-Platform
 ```bash
 # Clone or download the repository
-git clone <your-repo-url>
-cd restaurant-order-management
+git clone https://github.com/Odeneho-Calculus/Restaurant-Order-Management-System.git
+cd Restaurant-Order-Management-System
 
 # Run the application
 python run_restaurant_system.py
