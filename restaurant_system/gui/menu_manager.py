@@ -357,6 +357,11 @@ class MenuManagerTab:
         self.frame.bind('<Delete>', lambda e: self.delete_menu_item())
         self.frame.bind('<F2>', lambda e: self.edit_menu_item())
 
+    def update_menu_items(self, menu_items: List[MenuItem]) -> None:
+        """Update the menu items reference and refresh display."""
+        self.menu_items = menu_items
+        self.refresh_menu_list()
+
     def refresh_menu_list(self) -> None:
         """Refresh the menu items list display."""
         try:

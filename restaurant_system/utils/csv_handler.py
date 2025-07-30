@@ -9,6 +9,7 @@ import os
 import csv
 import shutil
 from datetime import datetime
+from decimal import Decimal
 from typing import List, Dict, Any, Optional, Callable
 from pathlib import Path
 import logging
@@ -291,7 +292,7 @@ class CSVHandler:
                     'status': row['status'],
                     'is_priority': row['is_priority'].lower() == 'true',
                     'notes': row['notes'],
-                    'tax_rate': float(row['tax_rate']),
+                    'tax_rate': Decimal(row['tax_rate']),
                     'items_json': row['items_json']
                 }
             except (ValueError, KeyError) as e:

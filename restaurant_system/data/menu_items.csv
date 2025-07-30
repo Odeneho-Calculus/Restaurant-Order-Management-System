@@ -1,5 +1,5 @@
 id,name,category,price,description,is_available
-menu_001,Caesar Salad,appetizers,12.99,Fresh romaine lettuce with parmesan cheese and croutons,True
+menu_001,Caesar Salader,appetizers,12.99,Fresh romaine lettuce with parmesan cheese and croutons,True
 menu_002,Buffalo Wings,appetizers,14.99,Spicy chicken wings served with blue cheese dip,True
 menu_003,Mozzarella Sticks,appetizers,9.99,Golden fried mozzarella with marinara sauce,True
 menu_004,Spinach Artichoke Dip,appetizers,11.99,Creamy spinach and artichoke dip with tortilla chips,True

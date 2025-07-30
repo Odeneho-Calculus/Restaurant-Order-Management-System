@@ -25,12 +25,12 @@ Thank you for your interest in contributing to this project! This document provi
 1. **Fork the repository** on GitHub
 2. **Clone your fork**:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/restaurant-order-management.git
-   cd restaurant-order-management
+   git clone https://github.com/Odeneho-Calculus/Restaurant-Order-Management-System.git
+   cd Restaurant-Order-Management-System
    ```
 3. **Add upstream remote**:
    ```bash
-   git remote add upstream https://github.com/ORIGINAL_OWNER/restaurant-order-management.git
+   git remote add upstream https://github.com/Odeneho-Calculus/Restaurant-Order-Management-System.git
    ```
 4. **Verify the system works**:
    ```bash

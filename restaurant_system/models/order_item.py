@@ -90,7 +90,7 @@ class OrderItem:
         Returns:
             Decimal: Quantity multiplied by unit price
         """
-        return self.unit_price * self.quantity
+        return self.unit_price * Decimal(str(self.quantity))
 
     @property
     def item_name(self) -> str:

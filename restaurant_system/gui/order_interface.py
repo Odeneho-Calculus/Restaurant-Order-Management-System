@@ -536,7 +536,7 @@ class OrderInterfaceTab:
         try:
             quantity = InputValidator.validate_quantity(qty_str)
 
-            if self.current_order:
+            if self.current_order is not None:
                 self.current_order.add_item(item, quantity)
                 self.refresh_order_display()
                 self.logger.info(f"Added {quantity}x {item.name} to order")
@@ -555,7 +555,7 @@ class OrderInterfaceTab:
             # Get special instructions
             instructions = self.get_special_instructions()
 
-            if self.current_order:
+            if self.current_order is not None:
                 self.current_order.add_item(item, quantity, instructions)
                 self.refresh_order_display()
                 self.logger.info(f"Added {quantity}x {item.name} with instructions to order")
