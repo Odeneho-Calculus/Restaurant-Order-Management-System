@@ -10,6 +10,40 @@ A comprehensive, professional-grade restaurant management solution built with Py
 
 > **🚀 Ready for immediate deployment** - Zero dependencies, complete documentation, production-quality code
 
+## ⚡ Quick Start
+
+### Option 1: Windows Users (Easiest)
+```bash
+# Double-click the batch file
+start_restaurant_system.bat
+```
+
+### Option 2: Cross-Platform
+```bash
+# Clone or download the repository
+git clone <your-repo-url>
+cd restaurant-order-management
+
+# Run the application
+python run_restaurant_system.py
+```
+
+### Option 3: Direct Launch
+```bash
+python restaurant_system/main.py
+```
+
+**That's it!** No pip install, no setup, no configuration needed. The system creates sample data automatically.
+
+## 🧪 Verify Installation
+
+Run the test suite to verify everything works:
+```bash
+python test_system.py
+```
+
+Expected output: `🎉 All tests passed! System is ready for use.`
+
 ## 🌟 Features
 
 ### Core Functionality
@@ -72,14 +106,14 @@ restaurant_system/
 1. **Clone or download the project**:
    ```bash
    # If using git
-   git clone <repository-url>
+   git clone https://github.com/Odeneho-Calculus/Restaurant-Order-Management-System.git
 
    # Or download and extract the ZIP file
    ```
 
 2. **Navigate to the project directory**:
    ```bash
-   cd restaurant-order-management
+   cd Restaurant-Order-Management-System
    ```
 
 3. **Install Python dependencies** (all standard library - no additional packages needed):
