@@ -402,9 +402,9 @@
     <script>
         console.log('📦 Starting script loading...');
         window.scriptLoadingProgress = {
-            total: 4,
+            total: 5,
             loaded: 0,
-            scripts: ['utils.js', 'api.js', 'components.js', 'app.js']
+            scripts: ['utils.js', 'api.js', 'components.js', 'food-image-service.js', 'app.js']
         };
 
         function trackScriptLoad(scriptName) {
@@ -475,6 +475,8 @@
         onerror="console.error('❌ Failed to load api.js')"></script>
     <script src="assets/js/components.js" onload="trackScriptLoad('components.js')"
         onerror="console.error('❌ Failed to load components.js')"></script>
+    <script src="assets/js/food-image-service.js" onload="trackScriptLoad('food-image-service.js')"
+        onerror="console.error('❌ Failed to load food-image-service.js')"></script>
     <script src="assets/js/app.js" onload="trackScriptLoad('app.js')"
         onerror="console.error('❌ Failed to load app.js')"></script>
 </body>

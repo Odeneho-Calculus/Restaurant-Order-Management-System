@@ -358,10 +358,17 @@ function showModal(title, content, options = {}) {
     }
 
     if (modalContent.querySelector('.modal-confirm')) {
-        modalContent.querySelector('.modal-confirm').addEventListener('click', () => {
+        modalContent.querySelector('.modal-confirm').addEventListener('click', async (e) => {
+            e.preventDefault();
+
             if (options.onConfirm) {
-                const result = options.onConfirm();
-                if (result !== false) closeModal();
+                try {
+                    const result = await options.onConfirm();
+                    if (result !== false) closeModal();
+                } catch (error) {
+                    console.error('Modal confirm error:', error);
+                    // Don't close modal on error
+                }
             } else {
                 closeModal();
             }

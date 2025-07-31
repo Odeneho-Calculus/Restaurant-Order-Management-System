@@ -195,10 +195,7 @@ class OrderItemComponent {
 
         orderItem.innerHTML = `
             <div class="order-item-image">
-                ${this.orderItem.image ?
-                `<img src="${this.orderItem.image}" alt="${sanitizeHtml(this.orderItem.name)}">` :
-                `<i class="order-item-placeholder fas fa-utensils"></i>`
-            }
+                ${this.renderOrderItemImage()}
             </div>
             <div class="order-item-details">
                 <div class="order-item-name">${sanitizeHtml(this.orderItem.name)}</div>
@@ -224,6 +221,53 @@ class OrderItemComponent {
         this.setupEventHandlers(orderItem);
 
         return orderItem;
+    }
+
+    /**
+     * Render order item image with fallback
+     */
+    renderOrderItemImage() {
+        const { sanitizeHtml } = RestaurantUtils;
+
+        if (this.orderItem.image) {
+            return `
+                <img src="${this.orderItem.image}"
+                     alt="${sanitizeHtml(this.orderItem.name)}"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                     style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
+                <div class="order-item-placeholder" style="display: none; width: 100%; height: 100%; background: #f5f5f5; border-radius: 4px; align-items: center; justify-content: center; font-size: 18px; color: #999;">
+                    ${this.getCategoryIcon()}
+                </div>
+            `;
+        } else {
+            return `
+                <div class="order-item-placeholder" style="width: 100%; height: 100%; background: #f5f5f5; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #999;">
+                    ${this.getCategoryIcon()}
+                </div>
+            `;
+        }
+    }
+
+    /**
+     * Get category-specific icon for placeholder
+     */
+    getCategoryIcon() {
+        const categoryIcons = {
+            'appetizers': '🥨',
+            'mains': '🍽️',
+            'desserts': '🍰',
+            'beverages': '🥤',
+            'salads': '🥗',
+            'soups': '🍲',
+            'pasta': '🍝',
+            'pizza': '🍕',
+            'burgers': '🍔',
+            'seafood': '🦐',
+            'steaks': '🥩'
+        };
+
+        const category = this.orderItem.category ? this.orderItem.category.toLowerCase() : 'mains';
+        return categoryIcons[category] || '🍽️';
     }
 
     setupEventHandlers(element) {

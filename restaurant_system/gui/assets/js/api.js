@@ -274,7 +274,18 @@ class RestaurantAPI {
                     break;
 
                 case 'exportData':
-                    result = { success: true, message: 'Data exported successfully' };
+                    // For export, we'll return a realistic mock response since
+                    // the actual export happens in the backend even in mock mode
+                    const period = data.options?.period || 'today';
+                    const timestamp = new Date().toISOString().replace(/[-:T]/g, '').split('.')[0];
+                    const filename = `sales_report_${period}_${timestamp}.csv`;
+
+                    result = {
+                        success: true,
+                        message: 'Sales report exported successfully',
+                        filename: filename,
+                        path: `reports/${filename}`
+                    };
                     break;
 
                 default:
@@ -409,7 +420,15 @@ class RestaurantAPI {
      * @returns {Promise<Object>} Export result
      */
     async exportData(type, options = {}) {
-        return this.request('exportData', { type, options });
+        console.log('📡 API: exportData called with:', { type, options });
+        try {
+            const result = await this.request('exportData', { type, options });
+            console.log('📡 API: exportData result:', result);
+            return result;
+        } catch (error) {
+            console.error('📡 API: exportData error:', error);
+            throw error;
+        }
     }
 
     /**

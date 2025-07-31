@@ -50,6 +50,12 @@ class RestaurantApp {
             this.hideLoading();
 
             console.log('🎊 Restaurant Management System initialized successfully!');
+
+            // Preload food images for better performance
+            this.preloadFoodImages();
+
+            // Test Pixabay API connection
+            this.testFoodImageAPI();
         } catch (error) {
             console.error('❌ Failed to initialize application:', error);
             console.error('Error details:', error.stack);
@@ -123,9 +129,35 @@ class RestaurantApp {
             this.handlePeriodChange(e.target.value);
         });
 
-        document.getElementById('exportReportBtn')?.addEventListener('click', () => {
-            this.exportReport();
+        // Use delegation for export button to handle dynamic content
+        document.addEventListener('click', (e) => {
+            if (e.target && (e.target.id === 'exportReportBtn' || e.target.closest('#exportReportBtn'))) {
+                e.preventDefault();
+                console.log('🖱️ Export button clicked via delegation!');
+                this.exportReport();
+            }
         });
+
+        // Also try direct binding with retry mechanism
+        const tryBindExportButton = (attempts = 0) => {
+            const exportBtn = document.getElementById('exportReportBtn');
+            if (exportBtn && !exportBtn.hasAttribute('data-listener-attached')) {
+                console.log('🔗 Export button found, attaching direct event listener...');
+                exportBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    console.log('🖱️ Export button clicked directly!');
+                    this.exportReport();
+                });
+                exportBtn.setAttribute('data-listener-attached', 'true');
+            } else if (!exportBtn && attempts < 5) {
+                console.log(`⏳ Export button not found, retrying... (attempt ${attempts + 1})`);
+                setTimeout(() => tryBindExportButton(attempts + 1), 1000);
+            } else if (!exportBtn) {
+                console.warn('⚠️ Export button not found after multiple attempts');
+            }
+        };
+
+        tryBindExportButton();
 
         document.getElementById('refreshReportBtn')?.addEventListener('click', () => {
             this.refreshReports();
@@ -244,6 +276,7 @@ class RestaurantApp {
                 break;
             case 'reports':
                 this.updateReportsData();
+                this.ensureReportsEventListeners();
                 break;
         }
     }
@@ -317,8 +350,10 @@ class RestaurantApp {
             // Use completely basic HTML with inline styles to bypass CSS issues
             menuCard.innerHTML = `
                 <div style="padding: 15px; background: white; border: 1px solid #ddd; border-radius: 8px; margin: 10px;">
-                    <div style="background: #f5f5f5; height: 120px; border-radius: 4px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
-                        <span style="font-size: 24px; color: #666;">🍽️</span>
+                    <div class="food-image-container" style="background: #f5f5f5; height: 120px; border-radius: 4px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; overflow: hidden; position: relative;">
+                        <div class="image-loading" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;">
+                            <i class="fas fa-spinner fa-spin" style="font-size: 20px; color: #666;"></i>
+                        </div>
                     </div>
                     <div style="margin-bottom: 10px;">
                         <h3 class="menu-item-name" style="margin: 0; font-size: 18px; font-weight: bold; color: #333;">${item.name}</h3>
@@ -351,6 +386,9 @@ class RestaurantApp {
 
             console.log(`✅ Successfully added menu item: ${item.name}`);
             console.log(`🔍 Card innerHTML length: ${menuCard.innerHTML.length}`);
+
+            // Load food image asynchronously
+            this.loadFoodImageForCard(menuCard, item);
             console.log(`🔍 Card has content: ${menuCard.innerHTML.includes(item.name)}`);
         });
 
@@ -374,7 +412,7 @@ class RestaurantApp {
     /**
      * Add item to current order
      */
-    addItemToOrder(itemId, itemName, itemPrice, quantity = 1) {
+    async addItemToOrder(itemId, itemName, itemPrice, quantity = 1) {
         console.log(`🛒 Adding to order: ${itemName} (${quantity}x) - $${itemPrice}`);
 
         // Find the full item details
@@ -392,6 +430,17 @@ class RestaurantApp {
             existingItem.quantity += quantity;
             console.log(`📈 Updated quantity for ${itemName}: ${existingItem.quantity}`);
         } else {
+            // Get food image for the order item
+            let imageUrl = null;
+            if (window.foodImageService) {
+                try {
+                    const imageData = await window.foodImageService.getFoodImage(itemName, menuItem.category);
+                    imageUrl = imageData ? imageData.url : null;
+                } catch (error) {
+                    console.warn(`⚠️ Could not load image for ${itemName}:`, error);
+                }
+            }
+
             // Add new item to order
             const orderItem = {
                 id: itemId,
@@ -399,10 +448,11 @@ class RestaurantApp {
                 price: parseFloat(itemPrice),
                 quantity: quantity,
                 category: menuItem.category,
-                description: menuItem.description
+                description: menuItem.description,
+                image: imageUrl
             };
             this.currentOrder.items.push(orderItem);
-            console.log(`➕ Added new item to order: ${itemName}`);
+            console.log(`➕ Added new item to order: ${itemName}${imageUrl ? ' (with image)' : ''}`);
         }
 
         // Update order totals
@@ -528,6 +578,196 @@ class RestaurantApp {
                 }
             }, 300);
         }, 3000);
+    }
+
+    /**
+     * Load food image for a menu card
+     */
+    async loadFoodImageForCard(menuCard, item) {
+        try {
+            console.log(`🖼️ Loading image for: ${item.name}`);
+
+            const imageContainer = menuCard.querySelector('.food-image-container');
+            if (!imageContainer) {
+                console.warn(`⚠️ Image container not found for ${item.name}`);
+                return;
+            }
+
+            // Get image data from the food image service
+            const imageData = await window.foodImageService.getFoodImage(item.name, item.category);
+
+            if (imageData) {
+                // Create the image element
+                const imageElement = window.foodImageService.createImageElement(
+                    imageData,
+                    item.name,
+                    {
+                        width: '100%',
+                        height: '120px',
+                        borderRadius: '4px',
+                        objectFit: 'cover'
+                    }
+                );
+
+                // Replace loading spinner with image
+                imageContainer.innerHTML = imageElement;
+
+                console.log(`✅ Image loaded for ${item.name}: ${imageData.source}`);
+            } else {
+                // Fallback to placeholder
+                const placeholder = window.foodImageService.getPlaceholderImage(item.category);
+                const placeholderElement = window.foodImageService.createImageElement(
+                    placeholder,
+                    item.name
+                );
+                imageContainer.innerHTML = placeholderElement;
+
+                console.log(`📷 Using placeholder for ${item.name}`);
+            }
+        } catch (error) {
+            console.error(`❌ Error loading image for ${item.name}:`, error);
+
+            // Fallback to simple emoji
+            const imageContainer = menuCard.querySelector('.food-image-container');
+            if (imageContainer) {
+                imageContainer.innerHTML = `
+                    <span style="font-size: 24px; color: #666;">🍽️</span>
+                `;
+            }
+        }
+    }
+
+    /**
+     * Preload food images for better performance
+     */
+    async preloadFoodImages() {
+        try {
+            console.log('🚀 Starting food image preloading...');
+
+            if (!window.foodImageService) {
+                console.warn('⚠️ Food image service not available, skipping preload');
+                return;
+            }
+
+            // Preload images for all menu items
+            await window.foodImageService.preloadMenuImages(this.menuItems);
+
+            console.log('✅ Food image preloading completed');
+        } catch (error) {
+            console.error('❌ Error preloading food images:', error);
+            // Don't throw error - this is not critical for app functionality
+        }
+    }
+
+    /**
+     * Test food image API connection
+     */
+    async testFoodImageAPI() {
+        try {
+            if (!window.foodImageService) {
+                console.warn('⚠️ Food image service not available');
+                return;
+            }
+
+            console.log('🧪 Testing Pixabay API connection...');
+            const isConnected = await window.foodImageService.testApiConnection();
+
+            if (isConnected) {
+                console.log('✅ Food image API is working correctly');
+            } else {
+                console.warn('⚠️ Food image API test failed - will use placeholders');
+            }
+        } catch (error) {
+            console.error('❌ Error testing food image API:', error);
+        }
+    }
+
+    /**
+     * Refresh all food images (useful for debugging)
+     */
+    async refreshAllFoodImages() {
+        try {
+            console.log('🔄 Refreshing all food images...');
+
+            if (window.foodImageService) {
+                window.foodImageService.clearCache();
+            }
+
+            // Re-render menu items to trigger image reload
+            this.updateMenuDisplay();
+
+            console.log('✅ Food images refresh initiated');
+        } catch (error) {
+            console.error('❌ Error refreshing food images:', error);
+        }
+    }
+
+    /**
+     * Show visual feedback when export is successful (same style as add to order)
+     */
+    showExportSuccessFeedback(filename) {
+        // Create a temporary notification
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #17a2b8;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10000;
+            font-weight: bold;
+            animation: slideInRight 0.3s ease-out;
+        `;
+        notification.innerHTML = `📤 ${filename} exported successfully!`;
+
+        document.body.appendChild(notification);
+
+        // Remove notification after 4 seconds (slightly longer for export)
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease-in';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }, 4000);
+    }
+
+    /**
+     * Show visual feedback when export fails (same style as add to order)
+     */
+    showExportErrorFeedback(errorMessage) {
+        // Create a temporary notification
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #dc3545;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10000;
+            font-weight: bold;
+            animation: slideInRight 0.3s ease-out;
+        `;
+        notification.innerHTML = `❌ Export failed: ${errorMessage}`;
+
+        document.body.appendChild(notification);
+
+        // Remove notification after 5 seconds (longer for error messages)
+        setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.3s ease-in';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }, 5000);
     }
 
     /**
@@ -778,33 +1018,35 @@ class RestaurantApp {
         const tableNumber = document.getElementById('tableNumber')?.value || 'N/A';
         const orderType = document.getElementById('orderType')?.value || 'dine_in';
 
+        // Get the most expensive item for header image
+        const headerItem = this.currentOrder.items.reduce((max, item) =>
+            (item.price * item.quantity) > (max.price * max.quantity) ? item : max
+        );
+
         // Create preview modal content
         const previewContent = `
             <div class="order-preview">
-                <h3>Order Preview</h3>
+                ${this.renderOrderPreviewHeader(headerItem)}
 
-                <div class="customer-info">
-                    <h4>Customer Information</h4>
-                    <div class="info-row"><strong>Name:</strong> ${customerName}</div>
-                    <div class="info-row"><strong>Phone:</strong> ${customerPhone}</div>
-                    <div class="info-row"><strong>Table:</strong> ${tableNumber}</div>
-                    <div class="info-row"><strong>Type:</strong> ${orderType.replace('_', ' ').toUpperCase()}</div>
-                </div>
+                <div class="preview-content">
+                    <div class="customer-info">
+                        <h4>Customer Information</h4>
+                        <div class="info-row"><strong>Name:</strong> ${customerName}</div>
+                        <div class="info-row"><strong>Phone:</strong> ${customerPhone}</div>
+                        <div class="info-row"><strong>Table:</strong> ${tableNumber}</div>
+                        <div class="info-row"><strong>Type:</strong> ${orderType.replace('_', ' ').toUpperCase()}</div>
+                    </div>
 
-                <div class="order-items-preview">
-                    <h4>Order Items</h4>
-                    ${this.currentOrder.items.map(item => `
-                        <div class="preview-item">
-                            <span>${item.quantity}x ${item.name}</span>
-                            <span>$${(parseFloat(item.price) * item.quantity).toFixed(2)}</span>
-                        </div>
-                    `).join('')}
-                </div>
+                    <div class="order-items-preview">
+                        <h4>Order Items</h4>
+                        ${this.currentOrder.items.map(item => this.renderPreviewItem(item)).join('')}
+                    </div>
 
-                <div class="order-totals-preview">
-                    <div class="total-row"><span>Subtotal:</span> <span>$${this.currentOrder.subtotal.toFixed(2)}</span></div>
-                    <div class="total-row"><span>Tax (8%):</span> <span>$${this.currentOrder.tax.toFixed(2)}</span></div>
-                    <div class="total-row total"><span><strong>Total:</strong></span> <span><strong>$${this.currentOrder.total.toFixed(2)}</strong></span></div>
+                    <div class="order-totals-preview">
+                        <div class="total-row"><span>Subtotal:</span> <span>$${this.currentOrder.subtotal.toFixed(2)}</span></div>
+                        <div class="total-row"><span>Tax (8%):</span> <span>$${this.currentOrder.tax.toFixed(2)}</span></div>
+                        <div class="total-row total"><span><strong>Total:</strong></span> <span><strong>$${this.currentOrder.total.toFixed(2)}</strong></span></div>
+                    </div>
                 </div>
             </div>
         `;
@@ -821,6 +1063,92 @@ class RestaurantApp {
                 return true; // Close modal
             }
         });
+    }
+
+    /**
+     * Render order preview header with featured image
+     */
+    renderOrderPreviewHeader(headerItem) {
+        const { sanitizeHtml } = RestaurantUtils;
+
+        return `
+            <div class="order-preview-header">
+                <div class="header-image-container">
+                    ${headerItem.image ? `
+                        <img src="${headerItem.image}"
+                             alt="${sanitizeHtml(headerItem.name)}"
+                             class="header-image"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="header-placeholder" style="display: none;">
+                            ${this.getCategoryIcon(headerItem.category)}
+                        </div>
+                    ` : `
+                        <div class="header-placeholder">
+                            ${this.getCategoryIcon(headerItem.category)}
+                        </div>
+                    `}
+                    <div class="header-overlay">
+                        <h3>Order Preview</h3>
+                        <p class="featured-item">${sanitizeHtml(headerItem.name)} ${headerItem.quantity > 1 ? `(${headerItem.quantity}x)` : ''}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Render individual preview item with image
+     */
+    renderPreviewItem(item) {
+        const { sanitizeHtml } = RestaurantUtils;
+
+        return `
+            <div class="preview-item">
+                <div class="preview-item-image">
+                    ${item.image ? `
+                        <img src="${item.image}"
+                             alt="${sanitizeHtml(item.name)}"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="preview-item-placeholder" style="display: none;">
+                            ${this.getCategoryIcon(item.category)}
+                        </div>
+                    ` : `
+                        <div class="preview-item-placeholder">
+                            ${this.getCategoryIcon(item.category)}
+                        </div>
+                    `}
+                </div>
+                <div class="preview-item-details">
+                    <span class="item-name">${item.quantity}x ${sanitizeHtml(item.name)}</span>
+                    ${item.instructions ? `<span class="item-instructions">${sanitizeHtml(item.instructions)}</span>` : ''}
+                </div>
+                <div class="preview-item-price">
+                    $${(parseFloat(item.price) * item.quantity).toFixed(2)}
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Get category-specific icon for placeholders
+     */
+    getCategoryIcon(category) {
+        const categoryIcons = {
+            'appetizers': '🥨',
+            'mains': '🍽️',
+            'desserts': '🍰',
+            'beverages': '🥤',
+            'salads': '🥗',
+            'soups': '🍲',
+            'pasta': '🍝',
+            'pizza': '🍕',
+            'burgers': '🍔',
+            'seafood': '🦐',
+            'steaks': '🥩'
+        };
+
+        const cat = category ? category.toLowerCase() : 'mains';
+        return categoryIcons[cat] || '🍽️';
     }
 
     /**
@@ -937,7 +1265,7 @@ class RestaurantApp {
     /**
      * Add item to current order
      */
-    addToOrder(menuItem, quantity = 1, instructions = '') {
+    async addToOrder(menuItem, quantity = 1, instructions = '') {
         const existingItem = this.currentOrder.items.find(item =>
             item.id === menuItem.id && item.instructions === instructions
         );
@@ -945,13 +1273,25 @@ class RestaurantApp {
         if (existingItem) {
             existingItem.quantity += quantity;
         } else {
+            // Get food image for the order item
+            let imageUrl = null;
+            if (window.foodImageService) {
+                try {
+                    const imageData = await window.foodImageService.getFoodImage(menuItem.name, menuItem.category);
+                    imageUrl = imageData ? imageData.url : null;
+                } catch (error) {
+                    console.warn(`⚠️ Could not load image for ${menuItem.name}:`, error);
+                }
+            }
+
             this.currentOrder.items.push({
                 id: menuItem.id,
                 name: menuItem.name,
                 price: menuItem.price,
                 quantity: quantity,
                 instructions: instructions,
-                image: menuItem.image
+                category: menuItem.category,
+                image: imageUrl
             });
         }
 
@@ -1302,13 +1642,29 @@ class RestaurantApp {
         RestaurantUtils.showModal(title, modalContent, {
             footerContent: `
                 <button class="btn btn-secondary modal-cancel">Cancel</button>
-                <button class="btn btn-primary" id="saveMenuItem">
+                <button class="btn btn-primary modal-confirm" id="saveMenuItem">
                     <i class="fas fa-save"></i>
                     ${isEdit ? 'Update' : 'Add'} Item
                 </button>
             `,
-            onConfirm: () => {
-                return this.saveMenuItem(editItem);
+            onConfirm: async () => {
+                // Show loading state on button
+                const saveBtn = document.getElementById('saveMenuItem');
+                if (saveBtn) {
+                    saveBtn.disabled = true;
+                    const originalText = saveBtn.innerHTML;
+                    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+                    try {
+                        const result = await this.saveMenuItem(editItem);
+                        return result;
+                    } finally {
+                        saveBtn.disabled = false;
+                        saveBtn.innerHTML = originalText;
+                    }
+                } else {
+                    return await this.saveMenuItem(editItem);
+                }
             }
         });
     }
@@ -1425,6 +1781,51 @@ class RestaurantApp {
             console.error('Error updating menu item status:', error);
             this.showNotification('Failed to update item status', 'error');
         }
+    }
+
+    /**
+     * Ensure reports event listeners are properly attached
+     */
+    ensureReportsEventListeners() {
+        console.log('🔧 Ensuring reports event listeners are attached...');
+
+        // Check and attach export button listener
+        const exportBtn = document.getElementById('exportReportBtn');
+        if (exportBtn && !exportBtn.hasAttribute('data-listener-attached')) {
+            console.log('🔗 Attaching export button listener...');
+            exportBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('🖱️ Export button clicked (ensured listener)!');
+                this.exportReport();
+            });
+            exportBtn.setAttribute('data-listener-attached', 'true');
+        }
+
+        // Check and attach refresh button listener
+        const refreshBtn = document.getElementById('refreshReportBtn');
+        if (refreshBtn && !refreshBtn.hasAttribute('data-refresh-listener-attached')) {
+            console.log('🔗 Attaching refresh button listener...');
+            refreshBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('🔄 Refresh button clicked (ensured listener)!');
+                this.refreshReports();
+            });
+            refreshBtn.setAttribute('data-refresh-listener-attached', 'true');
+        }
+
+        // Check and attach apply date range listener
+        const applyBtn = document.getElementById('applyDateRange');
+        if (applyBtn && !applyBtn.hasAttribute('data-apply-listener-attached')) {
+            console.log('🔗 Attaching apply date range listener...');
+            applyBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('📅 Apply date range clicked (ensured listener)!');
+                this.applyCustomDateRange();
+            });
+            applyBtn.setAttribute('data-apply-listener-attached', 'true');
+        }
+
+        console.log('✅ Reports event listeners ensured');
     }
 
     /**
@@ -1667,7 +2068,9 @@ class RestaurantApp {
      */
     async exportReport() {
         try {
+            console.log('📤 Starting report export...');
             const period = document.getElementById('reportPeriod')?.value || 'today';
+            console.log('📅 Export period:', period);
 
             let exportOptions = { period };
 
@@ -1686,20 +2089,189 @@ class RestaurantApp {
                     startDate,
                     endDate
                 };
+                console.log('📆 Custom date range:', exportOptions);
             }
 
-            this.showLoading('Exporting report...');
+            // Show loading state and disable button
+            const exportBtn = document.getElementById('exportReportBtn');
+            if (exportBtn) {
+                const originalText = exportBtn.innerHTML; // Store original text first
+                exportBtn.disabled = true;
+                exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting...';
 
-            const result = await restaurantAPI.exportData('csv', exportOptions);
+                console.log('🔄 Export button state set to loading...');
 
-            this.hideLoading();
-            this.showNotification(`Report exported: ${result.filename}`, 'success');
+                try {
+                    this.showLoading('Exporting report...');
+                    console.log('🔄 Calling API with options:', exportOptions);
+
+                    const result = await restaurantAPI.exportData('csv', exportOptions);
+                    console.log('✅ Export result:', result);
+
+                    // Add extra delay for mock mode to simulate real export time
+                    if (!restaurantAPI.usePyWebview) {
+                        console.log('⏳ Running in mock mode, adding export simulation delay...');
+                        await new Promise(resolve => setTimeout(resolve, 1500));
+                    }
+
+                    this.hideLoading();
+
+                    if (result && result.success) {
+                        // Show success notification using same system as "add to order"
+                        this.showExportSuccessFeedback(result.filename);
+                        if (result.path) {
+                            console.log('📁 File saved to:', result.path);
+                        }
+                    } else {
+                        throw new Error(result?.message || 'Export failed');
+                    }
+                } finally {
+                    // Always reset button state with multiple attempts
+                    console.log('🔄 Resetting export button to original state...');
+                    console.log('📝 Original text was:', originalText);
+                    console.log('📝 Current button text:', exportBtn.innerHTML);
+                    console.log('📝 Button disabled state:', exportBtn.disabled);
+
+                    // Immediate reset attempt
+                    try {
+                        exportBtn.disabled = false;
+                        exportBtn.innerHTML = '<i class="fas fa-download"></i> Export Report';
+                        console.log('✅ Immediate button reset complete');
+                    } catch (e) {
+                        console.error('❌ Immediate reset failed:', e);
+                    }
+
+                    // Delayed reset attempt
+                    setTimeout(() => {
+                        try {
+                            const btn = document.getElementById('exportReportBtn');
+                            if (btn) {
+                                btn.disabled = false;
+                                btn.innerHTML = '<i class="fas fa-download"></i> Export Report';
+                                console.log('✅ Delayed button reset complete');
+                            }
+                        } catch (e) {
+                            console.error('❌ Delayed reset failed:', e);
+                        }
+                    }, 100);
+
+                    // Multiple fallback attempts
+                    for (let i = 1; i <= 3; i++) {
+                        setTimeout(() => {
+                            const btn = document.getElementById('exportReportBtn');
+                            if (btn && (btn.disabled || btn.innerHTML.includes('Exporting'))) {
+                                console.log(`🔄 Fallback reset attempt ${i}...`);
+                                btn.disabled = false;
+                                btn.innerHTML = '<i class="fas fa-download"></i> Export Report';
+                            }
+                        }, 500 * i);
+                    }
+                }
+            } else {
+                // Fallback if button not found
+                this.showLoading('Exporting report...');
+                const result = await restaurantAPI.exportData('csv', exportOptions);
+
+                // Add extra delay for mock mode to simulate real export time
+                if (!restaurantAPI.usePyWebview) {
+                    console.log('⏳ Running in mock mode, adding export simulation delay...');
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                }
+
+                this.hideLoading();
+
+                if (result && result.success) {
+                    // Show success notification using same system as "add to order"
+                    this.showExportSuccessFeedback(result.filename);
+                    if (result.path) {
+                        console.log('📁 File saved to:', result.path);
+                    }
+                } else {
+                    throw new Error(result?.message || 'Export failed');
+                }
+            }
 
         } catch (error) {
-            console.error('Error exporting report:', error);
+            console.error('❌ Error exporting report:', error);
             this.hideLoading();
-            this.showNotification('Failed to export report', 'error');
+            this.showExportErrorFeedback(error.message);
+
+            // Emergency button reset if we're in the outer catch
+            const exportBtn = document.getElementById('exportReportBtn');
+            if (exportBtn && exportBtn.disabled) {
+                console.log('🚨 Emergency button reset triggered');
+                setTimeout(() => {
+                    exportBtn.disabled = false;
+                    exportBtn.innerHTML = exportBtn.innerHTML.includes('Exporting') ?
+                        '<i class="fas fa-download"></i> Export Report' : exportBtn.innerHTML;
+                }, 200);
+            }
         }
+
+        // Aggressive reset mechanism - force button to reset
+        this.forceResetExportButton();
+    }
+
+    /**
+     * Force reset export button to prevent stuck state
+     */
+    forceResetExportButton() {
+        console.log('🚀 Starting aggressive export button reset...');
+
+        const resetAttempts = [100, 500, 1000, 2000, 5000]; // Multiple time intervals
+
+        resetAttempts.forEach((delay, index) => {
+            setTimeout(() => {
+                const btn = document.getElementById('exportReportBtn');
+                if (btn) {
+                    const isStuck = btn.disabled || btn.innerHTML.includes('Exporting') || btn.innerHTML.includes('fa-spin');
+
+                    console.log(`🔍 Reset attempt ${index + 1}: Button stuck? ${isStuck}`);
+                    console.log(`📝 Current innerHTML: "${btn.innerHTML}"`);
+                    console.log(`📝 Current disabled: ${btn.disabled}`);
+
+                    if (isStuck) {
+                        console.log(`🔧 Forcing button reset (attempt ${index + 1})...`);
+
+                        // Force remove all classes and reset everything
+                        btn.disabled = false;
+                        btn.className = 'btn btn-primary';
+                        btn.innerHTML = '<i class="fas fa-download"></i> Export Report';
+
+                        // Also remove any spinning animations
+                        const spinners = btn.querySelectorAll('.fa-spin');
+                        spinners.forEach(spinner => spinner.classList.remove('fa-spin'));
+
+                        console.log('✅ Button force reset completed');
+                    } else {
+                        console.log('✅ Button is in correct state');
+                    }
+                } else {
+                    console.log('⚠️ Export button not found');
+                }
+            }, delay);
+        });
+
+        // Also create a global function for manual debugging
+        window.resetExportButton = () => {
+            console.log('🔧 Manual export button reset triggered...');
+            const btn = document.getElementById('exportReportBtn');
+            if (btn) {
+                console.log('📝 Before reset - innerHTML:', btn.innerHTML);
+                console.log('📝 Before reset - disabled:', btn.disabled);
+                console.log('📝 Before reset - className:', btn.className);
+
+                btn.disabled = false;
+                btn.className = 'btn btn-primary';
+                btn.innerHTML = '<i class="fas fa-download"></i> Export Report';
+
+                console.log('📝 After reset - innerHTML:', btn.innerHTML);
+                console.log('📝 After reset - disabled:', btn.disabled);
+                console.log('✅ Manual reset completed');
+            } else {
+                console.log('❌ Export button not found');
+            }
+        };
     }
 
     /**

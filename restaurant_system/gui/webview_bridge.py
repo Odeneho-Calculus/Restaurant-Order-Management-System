@@ -498,8 +498,18 @@ class WebViewAPI:
 
         if export_type == 'csv':
             try:
+                # Prepare sales data request with all options
+                sales_request = {'period': period}
+
+                # Handle custom date range
+                if period == 'custom':
+                    if 'startDate' in options:
+                        sales_request['startDate'] = options['startDate']
+                    if 'endDate' in options:
+                        sales_request['endDate'] = options['endDate']
+
                 # Get sales data for the specified period
-                sales_data = self.get_sales_data({'period': period})
+                sales_data = self.get_sales_data(sales_request)
 
                 # Create reports directory if it doesn't exist
                 reports_dir = self.data_dir.parent / 'reports'

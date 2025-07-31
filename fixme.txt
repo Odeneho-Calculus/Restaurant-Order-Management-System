@@ -1,311 +1,62 @@
- 📦 Starting script loading...
- 🔧 UTILS: Creating RestaurantUtils global object...
- ✅ UTILS: RestaurantUtils loaded and exported
- ✅ Loaded: utils.js (1/4)
- 🔧 API: Creating global RestaurantAPI instance...
- 🔗 API: Initializing communication bridge...
- 🔍 API: Checking pywebview availability (attempt 1/11)...
- 🌐 API: window.pywebview type: undefined
- 🌐 API: global pywebview type: undefined
- ⏳ API: pywebview not ready yet, retrying in 100ms...
- ✅ API: RestaurantAPI loaded and global instance created
- ✅ Loaded: api.js (2/4)
- 🔧 COMPONENTS: Creating RestaurantComponents global object...
- ✅ COMPONENTS: RestaurantComponents loaded and exported
- ✅ Loaded: components.js (3/4)
- 🔧 APP: RestaurantApp class defined and exported
- ✅ APP: RestaurantApp loaded and ready for initialization
- ✅ Loaded: app.js (4/4)
- 🎉 All scripts loaded, initializing application...
- 🏗️ Starting application initialization...
- ✅ All required objects available
- ⏳ Waiting for RestaurantAPI to be ready...
- ⏳ API not ready yet, listening for ready event...
- 🔍 API: Checking pywebview availability (attempt 2/11)...
- 🌐 API: window.pywebview type: undefined
- 🌐 API: global pywebview type: undefined
- ⏳ API: pywebview not ready yet, retrying in 100ms...
- 🔍 API: Checking pywebview availability (attempt 3/11)...
- 🌐 API: window.pywebview type: undefined
- 🌐 API: global pywebview type: undefined
- ⏳ API: pywebview not ready yet, retrying in 100ms...
- 🔍 API: Checking pywebview availability (attempt 4/11)...
- 🌐 API: window.pywebview type: undefined
- 🌐 API: global pywebview type: undefined
- ⏳ API: pywebview not ready yet, retrying in 100ms...
- 🔍 API: Checking pywebview availability (attempt 5/11)...
- 🌐 API: window.pywebview type: undefined
- 🌐 API: global pywebview type: undefined
- ⏳ API: pywebview not ready yet, retrying in 100ms...
- 🔍 API: Checking pywebview availability (attempt 6/11)...
- 🌐 API: window.pywebview type: undefined
- 🌐 API: global pywebview type: undefined
- ⏳ API: pywebview not ready yet, retrying in 100ms...
- 🔍 API: Checking pywebview availability (attempt 7/11)...
- 🌐 API: window.pywebview type: undefined
- 🌐 API: global pywebview type: undefined
- ⏳ API: pywebview not ready yet, retrying in 100ms...
- 🔍 API: Checking pywebview availability (attempt 8/11)...
- 🌐 API: window.pywebview type: undefined
- 🌐 API: global pywebview type: undefined
- ⏳ API: pywebview not ready yet, retrying in 100ms...
- 🔍 API: Checking pywebview availability (attempt 9/11)...
- 🌐 API: window.pywebview type: object
- 🌐 API: global pywebview type: object
- ✅ API: Using pywebview bridge for API communication
- 🔍 API: pywebview.api methods: (18) ['add_menu_item', 'backup_data', 'create_sample_menu_items', 'delete_menu_item', 'export_data', 'generate_receipt', 'get_menu_items', 'get_orders', 'get_sales_data', 'get_settings', 'handleRequest', 'load_data', 'restore_data', 'save_data', 'submit_order', 'update_menu_item', 'update_order_status', 'update_settings']
- 🔍 API: pywebview.api object: {add_menu_item: ƒ, backup_data: ƒ, create_sample_menu_items: ƒ, delete_menu_item: ƒ, export_data: ƒ, …}
- 🎉 API: RestaurantAPI is now ready for use
- 🎯 Received API ready event, initializing RestaurantApp...
- 🚀 RestaurantApp.init() - Starting initialization...
- 📱 Step 1: Showing loading overlay...
- 🎯 Step 2: Setting up event listeners...
- ✅ Event listeners setup completed
- 📊 Step 3: Loading initial data...
- 📊 loadInitialData() - Starting data loading...
- 🍽️ Loading menu items from API...
- API object available: true
- 🎊 RestaurantApp instance created successfully
- ✅ Loaded 23 menu items: (3) [{…}, {…}, {…}]
- 🔍 First menu item structure: {id: 'menu_001', name: 'Caesar Salader', category: 'appetizers', price: 12.99, description: 'Fresh romaine lettuce with parmesan cheese and croutons', …}
- 🔍 Available fields: (6) ['id', 'name', 'category', 'price', 'description', 'is_available']
- 🔍 is_available field: true
- 📋 Loading existing orders from API...
- ✅ Loaded 6 orders: (2) [{…}, {…}]
- 📊 Initial data loading completed successfully
- 🎨 Rendering menu items after data load...
- 🎨 renderMenuItems() - Starting menu rendering...
- ✅ Menu grid element found:
- 🍽️ Menu items available: 23
- 🔍 Order tab active: true
- 🔍 Order tab display: block
- 🔍 Menu grid display: grid
- 🔍 Menu grid visibility: visible
- 🔍 Menu grid opacity: 1
- 🔧 Fixed menu panel overflow for scrolling
- 📋 Rendering menu item 1/23: Caesar Salader
- ✅ Successfully added menu item: Caesar Salader
- 🔍 Card innerHTML length: 1577
- 🔍 Card has content: true
- 📋 Rendering menu item 2/23: Buffalo Wings
- ✅ Successfully added menu item: Buffalo Wings
- 🔍 Card innerHTML length: 1567
- 🔍 Card has content: true
- 📋 Rendering menu item 3/23: Mozzarella Sticks
- ✅ Successfully added menu item: Mozzarella Sticks
- 🔍 Card innerHTML length: 1569
- 🔍 Card has content: true
- 📋 Rendering menu item 4/23: Spinach Artichoke Dip
- ✅ Successfully added menu item: Spinach Artichoke Dip
- 🔍 Card innerHTML length: 1588
- 🔍 Card has content: true
- 📋 Rendering menu item 5/23: Tomato Basil Soup
- ✅ Successfully added menu item: Tomato Basil Soup
- 🔍 Card innerHTML length: 1559
- 🔍 Card has content: true
- 📋 Rendering menu item 6/23: Grilled Chicken Breast
- ✅ Successfully added menu item: Grilled Chicken Breast
- 🔍 Card innerHTML length: 1587
- 🔍 Card has content: true
- 📋 Rendering menu item 7/23: Ribeye Steak
- ✅ Successfully added menu item: Ribeye Steak
- 🔍 Card innerHTML length: 1557
- 🔍 Card has content: true
- 📋 Rendering menu item 8/23: Salmon Fillet
- ✅ Successfully added menu item: Salmon Fillet
- 🔍 Card innerHTML length: 1554
- 🔍 Card has content: true
- 📋 Rendering menu item 9/23: Pasta Alfredo
- ✅ Successfully added menu item: Pasta Alfredo
- 🔍 Card innerHTML length: 1555
- 🔍 Card has content: true
- 📋 Rendering menu item 10/23: BBQ Ribs
- ✅ Successfully added menu item: BBQ Ribs
- 🔍 Card innerHTML length: 1547
- 🔍 Card has content: true
- 📋 Rendering menu item 11/23: Margherita Pizza
- ✅ Successfully added menu item: Margherita Pizza
- 🔍 Card innerHTML length: 1566
- 🔍 Card has content: true
- 📋 Rendering menu item 12/23: Chicken Parmesan
- ✅ Successfully added menu item: Chicken Parmesan
- 🔍 Card innerHTML length: 1572
- 🔍 Card has content: true
- 📋 Rendering menu item 13/23: Fish and Chips
- ✅ Successfully added menu item: Fish and Chips
- 🔍 Card innerHTML length: 1552
- 🔍 Card has content: true
- 📋 Rendering menu item 14/23: Chocolate Lava Cake
- ✅ Successfully added menu item: Chocolate Lava Cake
- 🔍 Card innerHTML length: 1566
- 🔍 Card has content: true
- 📋 Rendering menu item 15/23: Tiramisu
- ✅ Successfully added menu item: Tiramisu
- 🔍 Card innerHTML length: 1556
- 🔍 Card has content: true
- 📋 Rendering menu item 16/23: New York Cheesecake
- ✅ Successfully added menu item: New York Cheesecake
- 🔍 Card innerHTML length: 1573
- 🔍 Card has content: true
- 📋 Rendering menu item 17/23: Ice Cream Sundae
- ✅ Successfully added menu item: Ice Cream Sundae
- 🔍 Card innerHTML length: 1578
- 🔍 Card has content: true
- 📋 Rendering menu item 18/23: Coca Cola
- ✅ Successfully added menu item: Coca Cola
- 🔍 Card innerHTML length: 1532
- 🔍 Card has content: true
- 📋 Rendering menu item 19/23: Fresh Orange Juice
- ✅ Successfully added menu item: Fresh Orange Juice
- 🔍 Card innerHTML length: 1556
- 🔍 Card has content: true
- 📋 Rendering menu item 20/23: Coffee
- ✅ Successfully added menu item: Coffee
- 🔍 Card innerHTML length: 1524
- 🔍 Card has content: true
- 📋 Rendering menu item 21/23: Iced Tea
- ✅ Successfully added menu item: Iced Tea
- 🔍 Card innerHTML length: 1537
- 🔍 Card has content: true
- 📋 Rendering menu item 22/23: Red Wine
- ✅ Successfully added menu item: Red Wine
- 🔍 Card innerHTML length: 1534
- 🔍 Card has content: true
- 📋 Rendering menu item 23/23: Beer
- ✅ Successfully added menu item: Beer
- 🔍 Card innerHTML length: 1519
- 🔍 Card has content: true
- 🎉 Rendered 23 menu items successfully
- 🔍 DOM Check: 23 menu cards found in DOM
- 🔍 Menu grid innerHTML length: 41447
- ✅ Initial data loaded successfully
- 🎨 Step 4: Initializing UI components...
- 🎨 initializeUI() - Setting up UI components...
- ✅ UI components setup completed
- ✅ UI initialization completed
- 🎉 Step 5: Initializing footer...
- 🎉 Step 6: Hiding loading overlay...
- 🔧 UTILS: Hiding loading spinner...
- ✅ UTILS: Loading spinner hidden successfully
- 🎊 Restaurant Management System initialized successfully!
- 🕐 Force rendering menu items after 1 second delay...
- 🎨 renderMenuItems() - Starting menu rendering...
- ✅ Menu grid element found:
- 🍽️ Menu items available: 23
- 🔍 Order tab active: true
- 🔍 Order tab display: block
- 🔍 Menu grid display: grid
- 🔍 Menu grid visibility: visible
- 🔍 Menu grid opacity: 1
- 🔧 Fixed menu panel overflow for scrolling
- 📋 Rendering menu item 1/23: Caesar Salader
- ✅ Successfully added menu item: Caesar Salader
- 🔍 Card innerHTML length: 1577
- 🔍 Card has content: true
- 📋 Rendering menu item 2/23: Buffalo Wings
- ✅ Successfully added menu item: Buffalo Wings
- 🔍 Card innerHTML length: 1567
- 🔍 Card has content: true
- 📋 Rendering menu item 3/23: Mozzarella Sticks
- ✅ Successfully added menu item: Mozzarella Sticks
- 🔍 Card innerHTML length: 1569
- 🔍 Card has content: true
- 📋 Rendering menu item 4/23: Spinach Artichoke Dip
- ✅ Successfully added menu item: Spinach Artichoke Dip
- 🔍 Card innerHTML length: 1588
- 🔍 Card has content: true
- 📋 Rendering menu item 5/23: Tomato Basil Soup
- ✅ Successfully added menu item: Tomato Basil Soup
- 🔍 Card innerHTML length: 1559
- 🔍 Card has content: true
- 📋 Rendering menu item 6/23: Grilled Chicken Breast
- ✅ Successfully added menu item: Grilled Chicken Breast
- 🔍 Card innerHTML length: 1587
- 🔍 Card has content: true
- 📋 Rendering menu item 7/23: Ribeye Steak
- ✅ Successfully added menu item: Ribeye Steak
- 🔍 Card innerHTML length: 1557
- 🔍 Card has content: true
- 📋 Rendering menu item 8/23: Salmon Fillet
- ✅ Successfully added menu item: Salmon Fillet
- 🔍 Card innerHTML length: 1554
- 🔍 Card has content: true
- 📋 Rendering menu item 9/23: Pasta Alfredo
- ✅ Successfully added menu item: Pasta Alfredo
- 🔍 Card innerHTML length: 1555
- 🔍 Card has content: true
- 📋 Rendering menu item 10/23: BBQ Ribs
- ✅ Successfully added menu item: BBQ Ribs
-app.js:345 🔍 Card innerHTML length: 1547
-app.js:346 🔍 Card has content: true
-app.js:298 📋 Rendering menu item 11/23: Margherita Pizza
-app.js:344 ✅ Successfully added menu item: Margherita Pizza
-app.js:345 🔍 Card innerHTML length: 1566
-app.js:346 🔍 Card has content: true
-app.js:298 📋 Rendering menu item 12/23: Chicken Parmesan
-app.js:344 ✅ Successfully added menu item: Chicken Parmesan
-app.js:345 🔍 Card innerHTML length: 1572
-app.js:346 🔍 Card has content: true
-app.js:298 📋 Rendering menu item 13/23: Fish and Chips
-app.js:344 ✅ Successfully added menu item: Fish and Chips
-app.js:345 🔍 Card innerHTML length: 1552
-app.js:346 🔍 Card has content: true
-app.js:298 📋 Rendering menu item 14/23: Chocolate Lava Cake
-app.js:344 ✅ Successfully added menu item: Chocolate Lava Cake
-app.js:345 🔍 Card innerHTML length: 1566
-app.js:346 🔍 Card has content: true
-app.js:298 📋 Rendering menu item 15/23: Tiramisu
-app.js:344 ✅ Successfully added menu item: Tiramisu
-app.js:345 🔍 Card innerHTML length: 1556
-app.js:346 🔍 Card has content: true
-app.js:298 📋 Rendering menu item 16/23: New York Cheesecake
-app.js:344 ✅ Successfully added menu item: New York Cheesecake
-app.js:345 🔍 Card innerHTML length: 1573
-app.js:346 🔍 Card has content: true
-app.js:298 📋 Rendering menu item 17/23: Ice Cream Sundae
-app.js:344 ✅ Successfully added menu item: Ice Cream Sundae
-app.js:345 🔍 Card innerHTML length: 1578
-app.js:346 🔍 Card has content: true
-app.js:298 📋 Rendering menu item 18/23: Coca Cola
-app.js:344 ✅ Successfully added menu item: Coca Cola
-app.js:345 🔍 Card innerHTML length: 1532
-app.js:346 🔍 Card has content: true
-app.js:298 📋 Rendering menu item 19/23: Fresh Orange Juice
-app.js:344 ✅ Successfully added menu item: Fresh Orange Juice
-app.js:345 🔍 Card innerHTML length: 1556
-app.js:346 🔍 Card has content: true
-app.js:298 📋 Rendering menu item 20/23: Coffee
-app.js:344 ✅ Successfully added menu item: Coffee
-app.js:345 🔍 Card innerHTML length: 1524
-app.js:346 🔍 Card has content: true
-app.js:298 📋 Rendering menu item 21/23: Iced Tea
-app.js:344 ✅ Successfully added menu item: Iced Tea
-app.js:345 🔍 Card innerHTML length: 1537
-app.js:346 🔍 Card has content: true
-app.js:298 📋 Rendering menu item 22/23: Red Wine
-app.js:344 ✅ Successfully added menu item: Red Wine
-app.js:345 🔍 Card innerHTML length: 1534
-app.js:346 🔍 Card has content: true
-app.js:298 📋 Rendering menu item 23/23: Beer
-app.js:344 ✅ Successfully added menu item: Beer
-app.js:345 🔍 Card innerHTML length: 1519
-app.js:346 🔍 Card has content: true
-app.js:349 🎉 Rendered 23 menu items successfully
-app.js:353 🔍 DOM Check: 23 menu cards found in DOM
-app.js:354 🔍 Menu grid innerHTML length: 41447
-app.js:370 🛒 Adding to order: Mozzarella Sticks (1x) - $9.99
-app.js:397 ➕ Added new item to order: Mozzarella Sticks
-app.js:421 💰 Order totals updated - Subtotal: $9.99, Tax: $0.80, Total: $10.79
-app.js:715 📤 Submitting order: {customer_name: 'Walk-in Customer', customer_phone: '', table_number: '', order_type: 'dine_in', items: Array(1), …}
-app.js:421 💰 Order totals updated - Subtotal: $0.00, Tax: $0.00, Total: $0.00
-app.js:747 ✅ Order submitted successfully
-app.js:1224  Error updating order status: Error: 'cooking' is not a valid OrderStatus
-    at RestaurantAPI.handlePythonResponse (api.js:191:28)
-    at api.js:72:18
-    at eval (eval at <anonymous> (index.html:2:29), <anonymous>:1:8)
-    at <anonymous>:2:29
-updateOrderStatus @ app.js:1224
-await in updateOrderStatus
-(anonymous) @ app.js:1196
-updateStatus @ components.js:467
-(anonymous) @ components.js:423
+index.html:403 📦 Starting script loading...
+utils.js:541 🔧 UTILS: Creating RestaurantUtils global object...
+utils.js:565 ✅ UTILS: RestaurantUtils loaded and exported
+index.html:412 ✅ Loaded: utils.js (1/4)
+api.js:508 🔧 API: Creating global RestaurantAPI instance...
+api.js:21 🔗 API: Initializing communication bridge...
+api.js:34 🔍 API: Checking pywebview availability (attempt 1/11)...
+api.js:35 🌐 API: window.pywebview type: undefined
+api.js:36 🌐 API: global pywebview type: undefined
+api.js:45 ⏳ API: pywebview not ready yet, retrying in 100ms...
+api.js:511 ✅ API: RestaurantAPI loaded and global instance created
+index.html:412 ✅ Loaded: api.js (2/4)
+components.js:693 🔧 COMPONENTS: Creating RestaurantComponents global object...
+components.js:702 ✅ COMPONENTS: RestaurantComponents loaded and exported
+index.html:412 ✅ Loaded: components.js (3/4)
+food-image-service.js:55 🖼️ Food Image Service initialized
+food-image-service.js:360 ✅ Food Image Service loaded successfully
+food-image-service.js:361 🔧 Debug functions available:
+food-image-service.js:362   - testPixabayAPI() - Test API connection
+food-image-service.js:363   - getFoodImageCacheStats() - Show cache statistics
+food-image-service.js:364   - clearFoodImageCache() - Clear image cache
+food-image-service.js:365   - testFoodImage(name, category) - Test specific food image
+food-image-service.js:366   - refreshAllFoodImages() - Refresh all menu images
+index.html:412 ✅ Loaded: food-image-service.js (4/4)
+index.html:415 🎉 All scripts loaded, initializing application...
+index.html:421 🏗️ Starting application initialization...
+index.html:428  ❌ Missing required objects: Array(1)
+initializeApp @ index.html:428
+app.js:2557 🔧 APP: RestaurantApp class defined and exported
+app.js:2559 ✅ APP: RestaurantApp loaded and ready for initialization
+index.html:412 ✅ Loaded: app.js (5/4)
+api.js:34 🔍 API: Checking pywebview availability (attempt 2/11)...
+api.js:35 🌐 API: window.pywebview type: undefined
+api.js:36 🌐 API: global pywebview type: undefined
+api.js:45 ⏳ API: pywebview not ready yet, retrying in 100ms...
+api.js:34 🔍 API: Checking pywebview availability (attempt 3/11)...
+api.js:35 🌐 API: window.pywebview type: undefined
+api.js:36 🌐 API: global pywebview type: undefined
+api.js:45 ⏳ API: pywebview not ready yet, retrying in 100ms...
+api.js:34 🔍 API: Checking pywebview availability (attempt 4/11)...
+api.js:35 🌐 API: window.pywebview type: undefined
+api.js:36 🌐 API: global pywebview type: undefined
+api.js:45 ⏳ API: pywebview not ready yet, retrying in 100ms...
+api.js:34 🔍 API: Checking pywebview availability (attempt 5/11)...
+api.js:35 🌐 API: window.pywebview type: undefined
+api.js:36 🌐 API: global pywebview type: undefined
+api.js:45 ⏳ API: pywebview not ready yet, retrying in 100ms...
+api.js:34 🔍 API: Checking pywebview availability (attempt 6/11)...
+api.js:35 🌐 API: window.pywebview type: undefined
+api.js:36 🌐 API: global pywebview type: undefined
+api.js:45 ⏳ API: pywebview not ready yet, retrying in 100ms...
+api.js:34 🔍 API: Checking pywebview availability (attempt 7/11)...
+api.js:35 🌐 API: window.pywebview type: undefined
+api.js:36 🌐 API: global pywebview type: undefined
+api.js:45 ⏳ API: pywebview not ready yet, retrying in 100ms...
+api.js:34 🔍 API: Checking pywebview availability (attempt 8/11)...
+api.js:35 🌐 API: window.pywebview type: object
+api.js:36 🌐 API: global pywebview type: object
+api.js:40 ✅ API: Using pywebview bridge for API communication
+api.js:41 🔍 API: pywebview.api methods: (18) ['add_menu_item', 'backup_data', 'create_sample_menu_items', 'delete_menu_item', 'export_data', 'generate_receipt', 'get_menu_items', 'get_orders', 'get_sales_data', 'get_settings', 'handleRequest', 'load_data', 'restore_data', 'save_data', 'submit_order', 'update_menu_item', 'update_order_status', 'update_settings']
+api.js:42 🔍 API: pywebview.api object: {add_menu_item: ƒ, backup_data: ƒ, create_sample_menu_items: ƒ, delete_menu_item: ƒ, export_data: ƒ, …}
+api.js:63 🎉 API: RestaurantAPI is now ready for use
