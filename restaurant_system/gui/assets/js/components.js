@@ -375,7 +375,7 @@ class QueueOrderComponent {
     getStatusText() {
         const statusMap = {
             'pending': 'Pending',
-            'cooking': 'Cooking',
+            'preparing': 'Preparing',
             'ready': 'Ready',
             'completed': 'Completed',
             'cancelled': 'Cancelled'
@@ -396,7 +396,7 @@ class QueueOrderComponent {
                         Cancel
                     </button>
                 `;
-            case 'cooking':
+            case 'preparing':
                 return `
                     <button class="btn btn-success mark-ready-btn">
                         <i class="fas fa-check"></i>
@@ -420,7 +420,7 @@ class QueueOrderComponent {
         const startCookingBtn = element.querySelector('.start-cooking-btn');
         if (startCookingBtn) {
             startCookingBtn.addEventListener('click', () => {
-                this.updateStatus('cooking');
+                this.updateStatus('preparing');
             });
         }
 

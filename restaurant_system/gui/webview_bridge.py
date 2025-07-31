@@ -351,9 +351,15 @@ class WebViewAPI:
         if not order:
             raise ValueError("Order not found")
 
-        # Update status
-        order.status = OrderStatus(new_status)
-        self.save_data()
+        # Update status using the proper method
+        try:
+            status_enum = OrderStatus(new_status)
+            order.update_status(status_enum)
+            self.save_data()
+        except ValueError as e:
+            # Provide better error message for invalid status values
+            valid_statuses = [status.value for status in OrderStatus]
+            raise ValueError(f"'{new_status}' is not a valid OrderStatus. Valid options are: {valid_statuses}")
 
         return order.to_dict()
 

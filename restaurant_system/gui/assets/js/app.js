@@ -1130,16 +1130,16 @@ class RestaurantApp {
 
         // Filter orders by status
         const activeOrders = this.orders.filter(order =>
-            ['pending', 'cooking', 'ready'].includes(order.status)
+            ['pending', 'preparing', 'ready'].includes(order.status)
         );
 
         // Update stats
         const pendingCount = activeOrders.filter(o => o.status === 'pending').length;
-        const cookingCount = activeOrders.filter(o => o.status === 'cooking').length;
+        const preparingCount = activeOrders.filter(o => o.status === 'preparing').length;
         const readyCount = activeOrders.filter(o => o.status === 'ready').length;
 
         document.getElementById('pendingCount').textContent = pendingCount;
-        document.getElementById('cookingCount').textContent = cookingCount;
+        document.getElementById('cookingCount').textContent = preparingCount;
         document.getElementById('readyCount').textContent = readyCount;
 
         // Render queue items
