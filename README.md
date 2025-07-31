@@ -3,12 +3,12 @@
 [![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)](https://python.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)](https://github.com)
-[![GUI Framework](https://img.shields.io/badge/GUI-Tkinter-orange.svg)](https://docs.python.org/3/library/tkinter.html)
+[![GUI Framework](https://img.shields.io/badge/GUI-Modern%20WebView-orange.svg)](https://pywebview.flowrl.com/)
 [![Status](https://img.shields.io/badge/status-Production%20Ready-brightgreen.svg)](https://github.com)
 
-A comprehensive, professional-grade restaurant management solution built with Python and Tkinter. This system provides everything needed to efficiently manage restaurant operations, from menu management to order processing and sales reporting.
+A comprehensive, professional-grade restaurant management solution built with Python and a modern web-based interface. This system provides everything needed to efficiently manage restaurant operations, from menu management to order processing and sales reporting.
 
-> **🚀 Ready for immediate deployment** - Zero dependencies, complete documentation, production-quality code
+> **🚀 Ready for immediate deployment** - Modern web-based interface, complete documentation, production-quality code
 
 ## ⚡ Quick Start
 
@@ -23,6 +23,9 @@ start_restaurant_system.bat
 # Clone or download the repository
 git clone https://github.com/Odeneho-Calculus/Restaurant-Order-Management-System.git
 cd Restaurant-Order-Management-System
+
+# Install dependencies
+pip install -r requirements.txt
 
 # Run the application
 python run_restaurant_system.py

@@ -340,8 +340,18 @@ class Order:
         Returns:
             dict: Dictionary containing all order properties
         """
+        # Serialize status history with datetime conversion
+        serialized_history = []
+        for entry in self._status_history:
+            serialized_entry = entry.copy()
+            if 'timestamp' in serialized_entry and hasattr(serialized_entry['timestamp'], 'isoformat'):
+                serialized_entry['timestamp'] = serialized_entry['timestamp'].isoformat()
+            serialized_history.append(serialized_entry)
+
         return {
+            'id': self.order_id,  # Use 'id' for consistency with frontend
             'order_id': self.order_id,
+            'created_at': self.timestamp.isoformat(),
             'timestamp': self.timestamp.isoformat(),
             'customer_name': self.customer_name,
             'customer_phone': self.customer_phone,
@@ -355,7 +365,7 @@ class Order:
             'subtotal': float(self.subtotal),
             'tax_amount': float(self.tax_amount),
             'total_amount': float(self.total_amount),
-            'status_history': self.status_history
+            'status_history': serialized_history
         }
 
     def get_receipt_data(self) -> dict:

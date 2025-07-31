@@ -21,8 +21,8 @@
 # - typing (type hints for better code quality)
 # - enum (enumerated constants)
 
-# No external dependencies required!
-# All functionality is implemented using Python's built-in modules.
+# Modern web-based interface dependencies:
+webview>=4.0.0           # Cross-platform webview for modern UI
 
 # Optional development tools (not required for running the application):
 # pytest>=6.0.0        # For unit testing

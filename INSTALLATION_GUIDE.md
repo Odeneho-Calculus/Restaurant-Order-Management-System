@@ -13,7 +13,11 @@
    ```bash
    cd path/to/restaurant_system
    ```
-3. **Run the launcher**:
+3. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. **Run the launcher**:
    ```bash
    python run_restaurant_system.py
    ```
@@ -31,12 +35,13 @@ python restaurant_system/main.py
 - **4GB RAM** (2GB minimum)
 - **100MB disk space**
 
-### Built-in Components
-- ✅ **tkinter** - GUI framework (included with Python)
+### Dependencies
+- ✅ **Python Standard Library** - Core functionality
+- 📦 **webview** - Modern web-based interface (`pip install webview`)
 - ✅ **csv** - Data storage (Python standard library)
-- ✅ **All other dependencies** - Standard library only!
+- ✅ **All other components** - Standard library only!
 
-**No pip install required!** 🎉
+**Modern Interface**: The system now features a modern web-based interface using HTML5, CSS3, and JavaScript for enhanced user experience.
 
 ## Pre-Installation Check
 

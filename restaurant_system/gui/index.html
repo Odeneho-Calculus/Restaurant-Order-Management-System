@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Order Management System</title>
+    <link rel="stylesheet" href="assets/css/base.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/animations.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div id="app" class="restaurant-app">
+        <!-- Navigation Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <i class="fas fa-utensils"></i>
+                    <h1>Restaurant Management</h1>
+                </div>
+                <nav class="main-nav">
+                    <button class="nav-tab active" data-tab="orders">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Orders</span>
+                    </button>
+                    <button class="nav-tab" data-tab="menu">
+                        <i class="fas fa-book"></i>
+                        <span>Menu</span>
+                    </button>
+                    <button class="nav-tab" data-tab="queue">
+                        <i class="fas fa-clock"></i>
+                        <span>Queue</span>
+                    </button>
+                    <button class="nav-tab" data-tab="reports">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Reports</span>
+                    </button>
+                </nav>
+                <div class="header-actions">
+                    <button class="action-btn" id="settingsBtn" title="Settings">
+                        <i class="fas fa-cog"></i>
+                        <span class="sr-only">Settings</span>
+                    </button>
+                    <button class="action-btn" id="helpBtn" title="Help">
+                        <i class="fas fa-question-circle"></i>
+                        <span class="sr-only">Help</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="app-main">
+            <!-- Order Interface Tab -->
+            <section id="orders-tab" class="tab-content active">
+                <div class="order-layout">
+                    <!-- Menu Selection Panel -->
+                    <div class="menu-panel">
+                        <div class="panel-header">
+                            <h2>Menu Selection</h2>
+                            <div class="search-container">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="menuSearch" placeholder="Search menu items...">
+                            </div>
+                        </div>
+
+                        <div class="category-filter">
+                            <button class="category-btn active" data-category="all">All Items</button>
+                            <button class="category-btn" data-category="appetizers">Appetizers</button>
+                            <button class="category-btn" data-category="mains">Main Course</button>
+                            <button class="category-btn" data-category="desserts">Desserts</button>
+                            <button class="category-btn" data-category="beverages">Beverages</button>
+                        </div>
+
+                        <div class="menu-grid" id="menuGrid">
+                            <!-- Menu items will be populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Order Details Panel -->
+                    <div class="order-panel">
+                        <div class="panel-header">
+                            <h2>Current Order</h2>
+                            <button class="clear-order-btn" id="clearOrderBtn">
+                                <i class="fas fa-trash"></i>
+                                Clear All
+                            </button>
+                        </div>
+
+                        <!-- Scrollable Content Area -->
+                        <div class="order-panel-content">
+                            <!-- Customer Information -->
+                            <div class="customer-info">
+                                <h3>Customer Information</h3>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="customerName">Name</label>
+                                        <input type="text" id="customerName" placeholder="Customer name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="customerPhone">Phone</label>
+                                        <input type="tel" id="customerPhone" placeholder="Phone number">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="tableNumber">Table</label>
+                                        <input type="text" id="tableNumber" placeholder="Table number">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="orderType">Order Type</label>
+                                        <select id="orderType">
+                                            <option value="dine_in">Dine In</option>
+                                            <option value="takeout">Takeout</option>
+                                            <option value="delivery">Delivery</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Order Items -->
+                            <div class="order-items">
+                                <h3>Order Items</h3>
+                                <div class="order-list" id="orderList">
+                                    <div class="empty-order">
+                                        <i class="fas fa-shopping-cart"></i>
+                                        <p>No items in order</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Order Summary -->
+                            <div class="order-summary">
+                                <div class="summary-row">
+                                    <span>Subtotal:</span>
+                                    <span id="subtotal">$0.00</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Tax (8%):</span>
+                                    <span id="tax">$0.00</span>
+                                </div>
+                                <div class="summary-row total">
+                                    <span>Total:</span>
+                                    <span id="total">$0.00</span>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="order-actions">
+                                <button class="btn btn-secondary" id="previewOrderBtn">
+                                    <i class="fas fa-eye"></i>
+                                    Preview
+                                </button>
+                                <button class="btn btn-primary" id="submitOrderBtn">
+                                    <i class="fas fa-check"></i>
+                                    Submit Order
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Menu Management Tab -->
+            <section id="menu-tab" class="tab-content">
+                <div class="menu-management">
+                    <div class="management-header">
+                        <h2>Menu Management</h2>
+                        <button class="btn btn-primary" id="addMenuItemBtn">
+                            <i class="fas fa-plus"></i>
+                            Add Item
+                        </button>
+                    </div>
+
+                    <div class="menu-table-container">
+                        <table class="menu-table" id="menuTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="menuTableBody">
+                                <!-- Menu items will be populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Queue Display Tab -->
+            <section id="queue-tab" class="tab-content">
+                <div class="queue-display">
+                    <div class="queue-header">
+                        <h2>Order Queue</h2>
+                        <div class="queue-stats">
+                            <div class="stat-card">
+                                <span class="stat-number" id="pendingCount">0</span>
+                                <span class="stat-label">Pending</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-number" id="cookingCount">0</span>
+                                <span class="stat-label">Cooking</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-number" id="readyCount">0</span>
+                                <span class="stat-label">Ready</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="queue-grid" id="queueGrid">
+                        <!-- Queue items will be populated dynamically -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reports Tab -->
+            <section id="reports-tab" class="tab-content">
+                <div class="reports-section">
+                    <div class="reports-header">
+                        <h2>Sales Reports</h2>
+                        <div class="report-controls">
+                            <select id="reportPeriod" title="Select Report Period" aria-label="Select Report Period">
+                                <option value="today">Today</option>
+                                <option value="week">This Week</option>
+                                <option value="month">This Month</option>
+                                <option value="custom">Custom Range</option>
+                            </select>
+                            <button class="btn btn-secondary" id="exportReportBtn">
+                                <i class="fas fa-download"></i>
+                                Export
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="reports-grid">
+                        <div class="report-card">
+                            <h3>Total Sales</h3>
+                            <div class="report-value" id="totalSales">$0.00</div>
+                        </div>
+                        <div class="report-card">
+                            <h3>Orders Count</h3>
+                            <div class="report-value" id="ordersCount">0</div>
+                        </div>
+                        <div class="report-card">
+                            <h3>Average Order</h3>
+                            <div class="report-value" id="avgOrder">$0.00</div>
+                        </div>
+                        <div class="report-card">
+                            <h3>Popular Items</h3>
+                            <div class="report-list" id="popularItems">
+                                <!-- Popular items will be populated -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Application Footer -->
+    <footer class="app-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-brand">
+                    <i class="fas fa-utensils"></i>
+                    <span>Restaurant Management System</span>
+                </div>
+                <p class="footer-description">
+                    Professional restaurant order management solution designed for efficiency and reliability.
+                </p>
+            </div>
+
+            <div class="footer-section">
+                <h4>Features</h4>
+                <ul class="footer-links">
+                    <li><i class="fas fa-check"></i> Order Management</li>
+                    <li><i class="fas fa-check"></i> Menu Administration</li>
+                    <li><i class="fas fa-check"></i> Sales Analytics</li>
+                    <li><i class="fas fa-check"></i> Real-time Reports</li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>System Info</h4>
+                <ul class="footer-info">
+                    <li><i class="fas fa-code"></i> Version 1.0.0</li>
+                    <li><i class="fas fa-calendar"></i> <span id="currentYear">2025</span></li>
+                    <li><i class="fas fa-server"></i> Status: <span class="status-indicator online">Online</span></li>
+                    <li><i class="fas fa-clock"></i> <span id="currentTime">--:--</span></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul class="footer-links">
+                    <li><a href="#" onclick="showHelp()"><i class="fas fa-question-circle"></i> Help Center</a></li>
+                    <li><a href="#" onclick="showSettings()"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="#" onclick="exportData()"><i class="fas fa-download"></i> Export Data</a></li>
+                    <li><a href="#" onclick="showAbout()"><i class="fas fa-info-circle"></i> About</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <p>&copy; <span id="copyrightYear">2025</span> Restaurant Management System. Built with modern web
+                    technologies.</p>
+                <div class="footer-tech-stack">
+                    <span class="tech-badge"><i class="fab fa-html5"></i> HTML5</span>
+                    <span class="tech-badge"><i class="fab fa-css3-alt"></i> CSS3</span>
+                    <span class="tech-badge"><i class="fab fa-js"></i> JavaScript</span>
+                    <span class="tech-badge"><i class="fab fa-python"></i> Python</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal Overlays -->
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal-content" id="modalContent">
+            <!-- Modal content will be populated dynamically -->
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+    <!-- Scripts with loading tracking -->
+    <script>
+        console.log('📦 Starting script loading...');
+        window.scriptLoadingProgress = {
+            total: 4,
+            loaded: 0,
+            scripts: ['utils.js', 'api.js', 'components.js', 'app.js']
+        };
+
+        function trackScriptLoad(scriptName) {
+            window.scriptLoadingProgress.loaded++;
+            console.log(`✅ Loaded: ${scriptName} (${window.scriptLoadingProgress.loaded}/${window.scriptLoadingProgress.total})`);
+
+            if (window.scriptLoadingProgress.loaded === window.scriptLoadingProgress.total) {
+                console.log('🎉 All scripts loaded, initializing application...');
+                initializeApp();
+            }
+        }
+
+        function initializeApp() {
+            console.log('🏗️ Starting application initialization...');
+
+            // Check if all required objects are available
+            const requiredObjects = ['Utils', 'RestaurantAPI', 'UIComponents', 'RestaurantApp'];
+            const missing = requiredObjects.filter(obj => typeof window[obj] === 'undefined');
+
+            if (missing.length > 0) {
+                console.error('❌ Missing required objects:', missing);
+                document.getElementById('loadingSpinner').innerHTML = '<p style="color: red;">Error: Missing required components: ' + missing.join(', ') + '</p>';
+                return;
+            }
+
+            console.log('✅ All required objects available');
+
+            // Wait for API to be ready before initializing the app
+            console.log('⏳ Waiting for RestaurantAPI to be ready...');
+
+            function waitForAPIReady() {
+                if (window.restaurantAPI && window.restaurantAPI.isReady) {
+                    console.log('🎯 API is ready, initializing RestaurantApp...');
+
+                    try {
+                        // Initialize the application
+                        window.restaurantApp = new RestaurantApp();
+                        console.log('🎊 RestaurantApp instance created successfully');
+                    } catch (error) {
+                        console.error('❌ Failed to create RestaurantApp instance:', error);
+                        document.getElementById('loadingSpinner').innerHTML = '<p style="color: red;">Failed to initialize: ' + error.message + '</p>';
+                    }
+                } else {
+                    // Wait for API ready event
+                    console.log('⏳ API not ready yet, listening for ready event...');
+                    window.addEventListener('restaurantapi-ready', function onAPIReady() {
+                        console.log('🎯 Received API ready event, initializing RestaurantApp...');
+                        window.removeEventListener('restaurantapi-ready', onAPIReady);
+
+                        try {
+                            window.restaurantApp = new RestaurantApp();
+                            console.log('🎊 RestaurantApp instance created successfully');
+                        } catch (error) {
+                            console.error('❌ Failed to create RestaurantApp instance:', error);
+                            document.getElementById('loadingSpinner').innerHTML = '<p style="color: red;">Failed to initialize: ' + error.message + '</p>';
+                        }
+                    });
+                }
+            }
+
+            waitForAPIReady();
+        }
+    </script>
+
+    <script src="assets/js/utils.js" onload="trackScriptLoad('utils.js')"
+        onerror="console.error('❌ Failed to load utils.js')"></script>
+    <script src="assets/js/api.js" onload="trackScriptLoad('api.js')"
+        onerror="console.error('❌ Failed to load api.js')"></script>
+    <script src="assets/js/components.js" onload="trackScriptLoad('components.js')"
+        onerror="console.error('❌ Failed to load components.js')"></script>
+    <script src="assets/js/app.js" onload="trackScriptLoad('app.js')"
+        onerror="console.error('❌ Failed to load app.js')"></script>
+</body>
+
+</html>

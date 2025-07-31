@@ -10,7 +10,7 @@ import sys
 import os
 import logging
 from pathlib import Path
-import tkinter as tk
+import webview
 from tkinter import messagebox
 
 # Add the project root to Python path for imports
@@ -18,10 +18,11 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 try:
-    from restaurant_system.gui import RestaurantMainWindow
+    from restaurant_system.gui.webview_bridge import RestaurantMainWindow
 except ImportError as e:
     print(f"Failed to import required modules: {e}")
     print("Please ensure all dependencies are installed and the project structure is correct.")
+    print("Run: pip install webview")
     sys.exit(1)
 
 
@@ -67,7 +68,7 @@ class RestaurantApplication:
         )
 
         # Set specific log levels for different modules
-        logging.getLogger('tkinter').setLevel(logging.WARNING)
+        logging.getLogger('webview').setLevel(logging.WARNING)
         logging.getLogger('PIL').setLevel(logging.WARNING)
 
     def setup_directories(self):
@@ -104,7 +105,7 @@ class RestaurantApplication:
 
             # Check required modules
             required_modules = [
-                'tkinter',
+                'webview',
                 'csv',
                 'json',
                 'datetime',
@@ -124,13 +125,14 @@ class RestaurantApplication:
             if missing_modules:
                 raise ImportError(f"Missing required modules: {', '.join(missing_modules)}")
 
-            # Check tkinter availability
+            # Check webview availability
             try:
-                root = tk.Tk()
-                root.withdraw()  # Hide the window
-                root.destroy()
-            except tk.TclError as e:
-                raise SystemError(f"Tkinter GUI framework not available: {e}")
+                # Test webview import and basic functionality
+                test_window = webview.create_window("Test", "about:blank", width=1, height=1)
+                # Clear the test window from memory
+                webview.windows.clear()
+            except Exception as e:
+                raise SystemError(f"WebView framework not available: {e}")
 
             self.logger.info("System requirements check passed")
             return True
@@ -144,10 +146,19 @@ class RestaurantApplication:
         try:
             # Check system requirements
             if not self.check_system_requirements():
-                messagebox.showerror(
-                    "System Requirements",
-                    "System requirements not met. Please check the logs for details."
-                )
+                try:
+                    import tkinter
+                    from tkinter import messagebox
+                    root = tkinter.Tk()
+                    root.withdraw()
+                    messagebox.showerror(
+                        "System Requirements",
+                        "System requirements not met. Please check the logs for details.\n\n"
+                        "Required: pip install webview"
+                    )
+                    root.destroy()
+                except:
+                    print("System requirements not met. Please install webview: pip install webview")
                 return False
 
             # Initialize main window
@@ -158,10 +169,18 @@ class RestaurantApplication:
 
         except Exception as e:
             self.logger.error(f"Failed to initialize application: {e}")
-            messagebox.showerror(
-                "Initialization Error",
-                f"Failed to initialize application:\n{e}\n\nCheck the log file for details."
-            )
+            try:
+                import tkinter
+                from tkinter import messagebox
+                root = tkinter.Tk()
+                root.withdraw()
+                messagebox.showerror(
+                    "Initialization Error",
+                    f"Failed to initialize application:\n{e}\n\nCheck the log file for details."
+                )
+                root.destroy()
+            except:
+                print(f"Failed to initialize application: {e}")
             return False
 
     def run(self):
@@ -180,10 +199,18 @@ class RestaurantApplication:
 
         except Exception as e:
             self.logger.error(f"Unexpected application error: {e}")
-            messagebox.showerror(
-                "Application Error",
-                f"An unexpected error occurred:\n{e}\n\nThe application will close."
-            )
+            try:
+                import tkinter
+                from tkinter import messagebox
+                root = tkinter.Tk()
+                root.withdraw()
+                messagebox.showerror(
+                    "Application Error",
+                    f"An unexpected error occurred:\n{e}\n\nThe application will close."
+                )
+                root.destroy()
+            except:
+                print(f"An unexpected error occurred: {e}")
             return 1
 
         finally:
@@ -196,8 +223,7 @@ class RestaurantApplication:
         """Cleanup resources before application shutdown."""
         try:
             if self.main_window:
-                # Perform any necessary cleanup
-                pass
+                self.main_window.cleanup()
 
             self.logger.info("Application cleanup completed")
 
@@ -206,54 +232,91 @@ class RestaurantApplication:
 
 
 def show_startup_splash():
-    """Show a startup splash screen."""
+    """Show a startup splash screen with modern styling."""
     try:
-        splash = tk.Tk()
-        splash.title("Restaurant Management System")
-        splash.geometry("400x200")
-        splash.resizable(False, False)
-        splash.configure(bg='navy')
+        # Create a simple splash using webview
+        splash_html = """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                body {
+                    margin: 0;
+                    padding: 0;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100vh;
+                    text-align: center;
+                }
+                .logo {
+                    font-size: 3rem;
+                    margin-bottom: 1rem;
+                }
+                .title {
+                    font-size: 1.8rem;
+                    font-weight: 300;
+                    margin-bottom: 0.5rem;
+                }
+                .subtitle {
+                    font-size: 1rem;
+                    opacity: 0.8;
+                    margin-bottom: 2rem;
+                }
+                .loading {
+                    font-size: 0.9rem;
+                    opacity: 0.7;
+                }
+                .spinner {
+                    width: 40px;
+                    height: 40px;
+                    border: 3px solid rgba(255,255,255,0.3);
+                    border-radius: 50%;
+                    border-top-color: white;
+                    animation: spin 1s ease-in-out infinite;
+                    margin: 1rem auto;
+                }
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="logo">🍽️</div>
+            <div class="title">Restaurant Management System</div>
+            <div class="subtitle">Modern Order Management Solution</div>
+            <div class="spinner"></div>
+            <div class="loading">Loading...</div>
+            <script>
+                setTimeout(() => {
+                    if (typeof pywebview !== 'undefined') {
+                        pywebview.api.closeSplash();
+                    }
+                }, 2000);
+            </script>
+        </body>
+        </html>
+        """
 
-        # Center the splash screen
-        splash.update_idletasks()
-        x = (splash.winfo_screenwidth() // 2) - (400 // 2)
-        y = (splash.winfo_screenheight() // 2) - (200 // 2)
-        splash.geometry(f"400x200+{x}+{y}")
+        class SplashAPI:
+            def closeSplash(self):
+                webview.windows[0].destroy()
 
-        # Remove window decorations
-        splash.overrideredirect(True)
-
-        # Splash content
-        title_label = tk.Label(
-            splash,
-            text="Restaurant Order\nManagement System",
-            font=('Arial', 18, 'bold'),
-            fg='white',
-            bg='navy'
+        webview.create_window(
+            "Loading",
+            html=splash_html,
+            width=400,
+            height=300,
+            resizable=False,
+            js_api=SplashAPI()
         )
-        title_label.pack(expand=True)
 
-        version_label = tk.Label(
-            splash,
-            text="Version 1.0.0",
-            font=('Arial', 10),
-            fg='lightgray',
-            bg='navy'
-        )
-        version_label.pack(side='bottom', pady=10)
-
-        loading_label = tk.Label(
-            splash,
-            text="Loading...",
-            font=('Arial', 10),
-            fg='white',
-            bg='navy'
-        )
-        loading_label.pack(side='bottom', pady=5)
-
-        # Show splash for 2 seconds
-        splash.after(2000, splash.destroy)
-        splash.mainloop()
+        webview.start(debug=False)
 
     except Exception:
         # If splash fails, continue without it
@@ -264,7 +327,7 @@ def main():
     """Main entry point function."""
     try:
         # Show startup splash
-        show_startup_splash()
+        # show_startup_splash()  # Commented out to avoid blocking
 
         # Create and run application
         app = RestaurantApplication()
@@ -273,7 +336,12 @@ def main():
     except Exception as e:
         print(f"Fatal error: {e}")
         try:
+            import tkinter
+            from tkinter import messagebox
+            root = tkinter.Tk()
+            root.withdraw()
             messagebox.showerror("Fatal Error", f"Fatal error occurred:\n{e}")
+            root.destroy()
         except:
             pass
         return 1

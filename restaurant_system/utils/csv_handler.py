@@ -59,7 +59,7 @@ class CSVHandler:
 
         # Orders CSV headers
         order_headers = [
-            'order_id', 'timestamp', 'customer_name', 'customer_phone',
+            'id', 'order_id', 'created_at', 'timestamp', 'customer_name', 'customer_phone',
             'table_number', 'order_type', 'status', 'is_priority', 'notes',
             'tax_rate', 'subtotal', 'tax_amount', 'total_amount', 'items_json'
         ]
@@ -252,7 +252,7 @@ class CSVHandler:
         import json
 
         headers = [
-            'order_id', 'timestamp', 'customer_name', 'customer_phone',
+            'id', 'order_id', 'created_at', 'timestamp', 'customer_name', 'customer_phone',
             'table_number', 'order_type', 'status', 'is_priority', 'notes',
             'tax_rate', 'subtotal', 'tax_amount', 'total_amount', 'items_json'
         ]
@@ -283,7 +283,9 @@ class CSVHandler:
         def process_order_row(row: Dict[str, str]) -> Optional[Dict[str, Any]]:
             try:
                 return {
+                    'id': row.get('id', ''),
                     'order_id': row['order_id'],
+                    'created_at': row.get('created_at', row.get('timestamp', '')),
                     'timestamp': row['timestamp'],
                     'customer_name': row['customer_name'],
                     'customer_phone': row['customer_phone'],
