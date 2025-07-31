@@ -512,6 +512,24 @@ class EventEmitter {
     }
 }
 
+/**
+ * Escape HTML characters for safe display
+ * @param {string} str - String to escape
+ * @returns {string} Escaped string
+ */
+function escapeHtml(str) {
+    if (typeof str !== 'string') return str;
+    const escapeMap = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#x27;',
+        '/': '&#x2F;'
+    };
+    return str.replace(/[&<>"'\/]/g, (match) => escapeMap[match]);
+}
+
 // Export utilities for use in other modules
 console.log('🔧 UTILS: Creating RestaurantUtils global object...');
 window.RestaurantUtils = {
@@ -524,6 +542,7 @@ window.RestaurantUtils = {
     validateEmail,
     validatePhone,
     sanitizeHtml,
+    escapeHtml,
     formatFileSize,
     calculatePercentage,
     createElement,

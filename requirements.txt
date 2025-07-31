@@ -22,7 +22,7 @@
 # - enum (enumerated constants)
 
 # Modern web-based interface dependencies:
-webview>=4.0.0           # Cross-platform webview for modern UI
+pywebview
 
 # Optional development tools (not required for running the application):
 # pytest>=6.0.0        # For unit testing

@@ -364,41 +364,203 @@ class WebViewAPI:
         return order.to_dict()
 
     def get_sales_data(self, data: Dict[str, Any] = None) -> Dict[str, Any]:
-        """Get sales data and reports."""
-        # Filter completed orders
-        completed_orders = [order for order in self.orders if order.status == OrderStatus.COMPLETED]
+        """Get sales data and reports with comprehensive filtering and calculations."""
+        from datetime import datetime, timedelta
 
-        # Calculate totals
-        total_sales = sum(order.total for order in completed_orders)
-        orders_count = len(completed_orders)
+        # Get filter period and custom dates
+        period = data.get('period', 'today') if data else 'today'
+
+        # Calculate date range based on period
+        now = datetime.now()
+
+        if period == 'custom' and data:
+            # Handle custom date range
+            try:
+                start_date_str = data.get('startDate')
+                end_date_str = data.get('endDate')
+
+                if start_date_str and end_date_str:
+                    start_date = datetime.strptime(start_date_str, '%Y-%m-%d').replace(hour=0, minute=0, second=0, microsecond=0)
+                    end_date = datetime.strptime(end_date_str, '%Y-%m-%d').replace(hour=23, minute=59, second=59, microsecond=999999)
+                else:
+                    # Fallback to today if custom dates are invalid
+                    start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+                    end_date = now.replace(hour=23, minute=59, second=59, microsecond=999999)
+                    period = 'today'
+            except ValueError:
+                # Fallback to today if date parsing fails
+                start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+                end_date = now.replace(hour=23, minute=59, second=59, microsecond=999999)
+                period = 'today'
+        elif period == 'today':
+            start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = now.replace(hour=23, minute=59, second=59, microsecond=999999)
+        elif period == 'week':
+            start_date = now - timedelta(days=now.weekday())
+            start_date = start_date.replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = now
+        elif period == 'month':
+            start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            end_date = now
+        else:  # default to today
+            start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+            end_date = now.replace(hour=23, minute=59, second=59, microsecond=999999)
+
+        # Filter orders by status and date range
+        filtered_orders = []
+        for order in self.orders:
+            # Check if order is completed
+            if order.status == OrderStatus.COMPLETED:
+                # Check date range (orders have timezone-aware timestamps)
+                order_date = order.timestamp.replace(tzinfo=None)  # Convert to naive datetime for comparison
+                if start_date <= order_date <= end_date:
+                    filtered_orders.append(order)
+
+        # Calculate financial metrics
+        total_sales = sum(order.total_amount for order in filtered_orders)
+        orders_count = len(filtered_orders)
         avg_order_value = total_sales / orders_count if orders_count > 0 else 0
 
-        # Calculate popular items
+        # Calculate popular items with proper access to order items
         item_counts = {}
-        for order in completed_orders:
-            for item in order.items:
-                if item.menu_item.name in item_counts:
-                    item_counts[item.menu_item.name] += item.quantity
-                else:
-                    item_counts[item.menu_item.name] = item.quantity
+        total_items_sold = 0
 
+        for order in filtered_orders:
+            for item in order.items:  # This accesses the _items list through the property
+                item_name = item.menu_item.name if hasattr(item, 'menu_item') else item.item_name
+                item_quantity = item.quantity
+
+                if item_name in item_counts:
+                    item_counts[item_name] += item_quantity
+                else:
+                    item_counts[item_name] = item_quantity
+
+                total_items_sold += item_quantity
+
+        # Sort and format popular items
         popular_items = sorted(item_counts.items(), key=lambda x: x[1], reverse=True)[:5]
-        popular_items = [{'name': name, 'count': count} for name, count in popular_items]
+        popular_items = [
+            {
+                'name': name,
+                'count': count,
+                'percentage': round((count / total_items_sold * 100), 1) if total_items_sold > 0 else 0
+            }
+            for name, count in popular_items
+        ]
+
+        # Calculate additional metrics
+        if len(filtered_orders) > 0:
+            # Revenue by time (hourly breakdown for today, daily for week/month)
+            time_breakdown = {}
+            for order in filtered_orders:
+                if period == 'today':
+                    time_key = order.timestamp.strftime('%H:00')
+                elif period == 'week':
+                    time_key = order.timestamp.strftime('%a')
+                else:  # month
+                    time_key = order.timestamp.strftime('%d')
+
+                if time_key not in time_breakdown:
+                    time_breakdown[time_key] = {'sales': 0, 'orders': 0}
+
+                time_breakdown[time_key]['sales'] += float(order.total_amount)
+                time_breakdown[time_key]['orders'] += 1
+
+            # Sort time breakdown
+            sorted_time_breakdown = sorted(time_breakdown.items())
+        else:
+            sorted_time_breakdown = []
+
+        self.logger.info(f"📊 Sales data calculated for period '{period}': ${total_sales:.2f} from {orders_count} orders")
 
         return {
-            'totalSales': total_sales,
+            'totalSales': float(total_sales),
             'ordersCount': orders_count,
-            'avgOrderValue': avg_order_value,
-            'popularItems': popular_items
+            'avgOrderValue': float(avg_order_value),
+            'popularItems': popular_items,
+            'period': period,
+            'dateRange': {
+                'start': start_date.isoformat(),
+                'end': end_date.isoformat()
+            },
+            'timeBreakdown': sorted_time_breakdown,
+            'totalItemsSold': total_items_sold
         }
 
     def export_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        """Export data to file."""
+        """Export data to file with enhanced reporting."""
+        import csv
+        from pathlib import Path
+
         export_type = data.get('type', 'csv')
+        options = data.get('options', {})
+        period = options.get('period', 'today')
 
         if export_type == 'csv':
-            # Data is already saved in CSV format
-            return {'success': True, 'message': 'Data exported to CSV files'}
+            try:
+                # Get sales data for the specified period
+                sales_data = self.get_sales_data({'period': period})
+
+                # Create reports directory if it doesn't exist
+                reports_dir = self.data_dir.parent / 'reports'
+                reports_dir.mkdir(exist_ok=True)
+
+                # Generate filename with timestamp
+                from datetime import datetime
+                timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+                filename = f'sales_report_{period}_{timestamp}.csv'
+                file_path = reports_dir / filename
+
+                # Write sales report to CSV
+                with open(file_path, 'w', newline='', encoding='utf-8') as csvfile:
+                    writer = csv.writer(csvfile)
+
+                    # Write header information
+                    writer.writerow(['Restaurant Sales Report'])
+                    writer.writerow(['Period:', period.title()])
+                    writer.writerow(['Generated:', datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
+                    writer.writerow([])  # Empty row
+
+                    # Write summary
+                    writer.writerow(['SUMMARY'])
+                    writer.writerow(['Total Sales:', f"${sales_data['totalSales']:.2f}"])
+                    writer.writerow(['Orders Count:', sales_data['ordersCount']])
+                    writer.writerow(['Average Order Value:', f"${sales_data['avgOrderValue']:.2f}"])
+                    writer.writerow(['Total Items Sold:', sales_data['totalItemsSold']])
+                    writer.writerow([])  # Empty row
+
+                    # Write popular items
+                    writer.writerow(['POPULAR ITEMS'])
+                    writer.writerow(['Rank', 'Item Name', 'Quantity Sold', 'Percentage'])
+                    for i, item in enumerate(sales_data['popularItems'], 1):
+                        writer.writerow([i, item['name'], item['count'], f"{item['percentage']}%"])
+                    writer.writerow([])  # Empty row
+
+                    # Write time breakdown
+                    if sales_data['timeBreakdown']:
+                        writer.writerow(['TIME BREAKDOWN'])
+                        if period == 'today':
+                            writer.writerow(['Hour', 'Sales', 'Orders'])
+                        elif period == 'week':
+                            writer.writerow(['Day', 'Sales', 'Orders'])
+                        else:
+                            writer.writerow(['Date', 'Sales', 'Orders'])
+
+                        for time_key, data in sales_data['timeBreakdown']:
+                            writer.writerow([time_key, f"${data['sales']:.2f}", data['orders']])
+
+                self.logger.info(f"📄 Sales report exported to: {file_path}")
+
+                return {
+                    'success': True,
+                    'message': f'Sales report exported successfully',
+                    'filename': filename,
+                    'path': str(file_path)
+                }
+
+            except Exception as e:
+                self.logger.error(f"Error exporting sales report: {e}")
+                raise ValueError(f"Failed to export sales report: {str(e)}")
         else:
             raise ValueError(f"Unsupported export type: {export_type}")
 

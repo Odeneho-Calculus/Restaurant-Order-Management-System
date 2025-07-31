@@ -233,6 +233,21 @@
                                 <option value="month">This Month</option>
                                 <option value="custom">Custom Range</option>
                             </select>
+
+                            <div class="custom-date-range" id="customDateRange" style="display: none;">
+                                <input type="date" id="startDate" class="date-input" title="Start Date">
+                                <span class="date-separator">to</span>
+                                <input type="date" id="endDate" class="date-input" title="End Date">
+                                <button class="btn btn-primary btn-sm" id="applyDateRange">
+                                    <i class="fas fa-check"></i>
+                                    Apply
+                                </button>
+                            </div>
+
+                            <button class="btn btn-outline-secondary" id="refreshReportBtn" title="Refresh Report">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+
                             <button class="btn btn-secondary" id="exportReportBtn">
                                 <i class="fas fa-download"></i>
                                 Export
@@ -240,23 +255,70 @@
                         </div>
                     </div>
 
-                    <div class="reports-grid">
-                        <div class="report-card">
-                            <h3>Total Sales</h3>
-                            <div class="report-value" id="totalSales">$0.00</div>
+                    <div class="reports-overview">
+                        <div class="reports-grid">
+                            <div class="report-card metric-card">
+                                <div class="card-icon">
+                                    <i class="fas fa-dollar-sign"></i>
+                                </div>
+                                <div class="card-content">
+                                    <h3>Total Sales</h3>
+                                    <div class="report-value" id="totalSales">$0.00</div>
+                                    <div class="report-change" id="salesChange"></div>
+                                </div>
+                            </div>
+
+                            <div class="report-card metric-card">
+                                <div class="card-icon">
+                                    <i class="fas fa-receipt"></i>
+                                </div>
+                                <div class="card-content">
+                                    <h3>Orders Count</h3>
+                                    <div class="report-value" id="ordersCount">0</div>
+                                    <div class="report-change" id="ordersChange"></div>
+                                </div>
+                            </div>
+
+                            <div class="report-card metric-card">
+                                <div class="card-icon">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <div class="card-content">
+                                    <h3>Average Order</h3>
+                                    <div class="report-value" id="avgOrder">$0.00</div>
+                                    <div class="report-change" id="avgChange"></div>
+                                </div>
+                            </div>
+
+                            <div class="report-card metric-card">
+                                <div class="card-icon">
+                                    <i class="fas fa-box"></i>
+                                </div>
+                                <div class="card-content">
+                                    <h3>Items Sold</h3>
+                                    <div class="report-value" id="totalItemsSold">0</div>
+                                    <div class="report-period" id="reportPeriodLabel">Today</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="report-card">
-                            <h3>Orders Count</h3>
-                            <div class="report-value" id="ordersCount">0</div>
+                    </div>
+
+                    <div class="reports-details">
+                        <div class="report-section">
+                            <div class="report-card popular-items-card">
+                                <h3><i class="fas fa-trophy"></i> Popular Items</h3>
+                                <div class="popular-items-list" id="popularItems">
+                                    <div class="no-data">No sales data available</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="report-card">
-                            <h3>Average Order</h3>
-                            <div class="report-value" id="avgOrder">$0.00</div>
-                        </div>
-                        <div class="report-card">
-                            <h3>Popular Items</h3>
-                            <div class="report-list" id="popularItems">
-                                <!-- Popular items will be populated -->
+
+                        <div class="report-section">
+                            <div class="report-card time-breakdown-card">
+                                <h3><i class="fas fa-clock"></i> <span id="timeBreakdownTitle">Sales by Hour</span></h3>
+                                <div class="time-breakdown-chart" id="timeBreakdown">
+                                    <div class="no-data">No data available</div>
+                                </div>
                             </div>
                         </div>
                     </div>

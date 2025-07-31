@@ -120,11 +120,19 @@ class RestaurantApp {
 
         // Reports
         document.getElementById('reportPeriod')?.addEventListener('change', (e) => {
-            this.updateReportsData(e.target.value);
+            this.handlePeriodChange(e.target.value);
         });
 
         document.getElementById('exportReportBtn')?.addEventListener('click', () => {
             this.exportReport();
+        });
+
+        document.getElementById('refreshReportBtn')?.addEventListener('click', () => {
+            this.refreshReports();
+        });
+
+        document.getElementById('applyDateRange')?.addEventListener('click', () => {
+            this.applyCustomDateRange();
         });
 
         // Settings and help
@@ -1420,44 +1428,272 @@ class RestaurantApp {
     }
 
     /**
-     * Update reports data
+     * Update reports data with enhanced visualization
      */
     async updateReportsData(period = 'today') {
         try {
+            console.log(`📊 Loading sales data for period: ${period}`);
+            this.showLoading('Loading reports...');
+
             const salesData = await restaurantAPI.getSalesData({ period });
+            console.log('📈 Sales data received:', salesData);
 
-            // Update report values
-            document.getElementById('totalSales').textContent = RestaurantUtils.formatCurrency(salesData.totalSales);
-            document.getElementById('ordersCount').textContent = salesData.ordersCount;
-            document.getElementById('avgOrder').textContent = RestaurantUtils.formatCurrency(salesData.avgOrderValue);
+            // Get period label
+            const periodText = {
+                'today': 'Today',
+                'week': 'This Week',
+                'month': 'This Month'
+            };
 
-            // Update popular items
-            const popularItemsList = document.getElementById('popularItems');
-            if (popularItemsList && salesData.popularItems) {
-                popularItemsList.innerHTML = salesData.popularItems
-                    .map(item => `<div>${item.name} (${item.count} orders)</div>`)
-                    .join('') || 'No data available';
-            }
+            this.displaySalesData(salesData, periodText[period] || period);
+            this.hideLoading();
 
         } catch (error) {
             console.error('Error loading reports data:', error);
+            this.hideLoading();
             this.showNotification('Failed to load reports data', 'error');
+
+            // Show error state
+            this.showReportsErrorState();
         }
     }
 
     /**
-     * Export report
+     * Update popular items display
+     */
+    updatePopularItems(popularItems) {
+        const popularItemsList = document.getElementById('popularItems');
+        if (!popularItemsList) return;
+
+        if (!popularItems || popularItems.length === 0) {
+            popularItemsList.innerHTML = '<div class="no-data">No sales data available</div>';
+            return;
+        }
+
+        popularItemsList.innerHTML = popularItems
+            .map((item, index) => `
+                <div class="popular-item">
+                    <div class="popular-item-rank">${index + 1}</div>
+                    <div class="popular-item-info">
+                        <div class="popular-item-name">${RestaurantUtils.escapeHtml(item.name)}</div>
+                        <div class="popular-item-stats">${item.count} sold • ${item.percentage}% of total</div>
+                    </div>
+                </div>
+            `)
+            .join('');
+    }
+
+    /**
+     * Update time breakdown chart
+     */
+    updateTimeBreakdown(timeBreakdown, period) {
+        const timeBreakdownContainer = document.getElementById('timeBreakdown');
+        if (!timeBreakdownContainer) return;
+
+        if (!timeBreakdown || timeBreakdown.length === 0) {
+            timeBreakdownContainer.innerHTML = '<div class="no-data">No time breakdown data available</div>';
+            return;
+        }
+
+        // Find maximum sales value for chart scaling
+        const maxSales = Math.max(...timeBreakdown.map(([_, data]) => data.sales));
+
+        timeBreakdownContainer.innerHTML = timeBreakdown
+            .map(([timeKey, data]) => {
+                const percentage = maxSales > 0 ? (data.sales / maxSales) * 100 : 0;
+                return `
+                    <div class="time-breakdown-item">
+                        <div class="time-breakdown-label">${timeKey}</div>
+                        <div class="time-breakdown-bar">
+                            <div class="time-breakdown-fill" style="width: ${percentage}%"></div>
+                        </div>
+                        <div class="time-breakdown-value">$${data.sales.toFixed(2)}</div>
+                    </div>
+                `;
+            })
+            .join('');
+    }
+
+    /**
+     * Show error state for reports
+     */
+    showReportsErrorState() {
+        // Reset all values to default
+        document.getElementById('totalSales').textContent = '$0.00';
+        document.getElementById('ordersCount').textContent = '0';
+        document.getElementById('avgOrder').textContent = '$0.00';
+        document.getElementById('totalItemsSold').textContent = '0';
+
+        // Show error messages
+        const popularItemsList = document.getElementById('popularItems');
+        if (popularItemsList) {
+            popularItemsList.innerHTML = '<div class="no-data">Error loading data</div>';
+        }
+
+        const timeBreakdownContainer = document.getElementById('timeBreakdown');
+        if (timeBreakdownContainer) {
+            timeBreakdownContainer.innerHTML = '<div class="no-data">Error loading data</div>';
+        }
+    }
+
+    /**
+     * Handle period change
+     */
+    handlePeriodChange(period) {
+        const customDateRange = document.getElementById('customDateRange');
+
+        if (period === 'custom') {
+            customDateRange.style.display = 'flex';
+
+            // Set default dates
+            const today = new Date();
+            const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+            document.getElementById('startDate').valueAsDate = weekAgo;
+            document.getElementById('endDate').valueAsDate = today;
+        } else {
+            customDateRange.style.display = 'none';
+            this.updateReportsData(period);
+        }
+    }
+
+    /**
+     * Apply custom date range
+     */
+    async applyCustomDateRange() {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        if (!startDate || !endDate) {
+            this.showNotification('Please select both start and end dates', 'warning');
+            return;
+        }
+
+        if (new Date(startDate) > new Date(endDate)) {
+            this.showNotification('Start date must be before end date', 'warning');
+            return;
+        }
+
+        try {
+            this.showLoading('Loading custom date range...');
+
+            // Create custom period object for backend
+            const customPeriod = {
+                type: 'custom',
+                startDate: startDate,
+                endDate: endDate
+            };
+
+            const salesData = await restaurantAPI.getSalesData(customPeriod);
+
+            // Update displays with custom data
+            this.displaySalesData(salesData, `${startDate} to ${endDate}`);
+
+            this.hideLoading();
+            this.showNotification('Custom date range applied successfully', 'success');
+
+        } catch (error) {
+            console.error('Error applying custom date range:', error);
+            this.hideLoading();
+            this.showNotification('Failed to load custom date range', 'error');
+        }
+    }
+
+    /**
+     * Refresh reports
+     */
+    async refreshReports() {
+        const period = document.getElementById('reportPeriod')?.value || 'today';
+        const refreshBtn = document.getElementById('refreshReportBtn');
+
+        // Add spinning animation
+        const icon = refreshBtn.querySelector('i');
+        icon.style.animation = 'spin 1s linear infinite';
+
+        try {
+            if (period === 'custom') {
+                await this.applyCustomDateRange();
+            } else {
+                await this.updateReportsData(period);
+            }
+
+            this.showNotification('Reports refreshed successfully', 'success');
+
+        } catch (error) {
+            console.error('Error refreshing reports:', error);
+            this.showNotification('Failed to refresh reports', 'error');
+        } finally {
+            // Remove spinning animation
+            setTimeout(() => {
+                icon.style.animation = '';
+            }, 1000);
+        }
+    }
+
+    /**
+     * Display sales data (consolidated method)
+     */
+    displaySalesData(salesData, periodLabel) {
+        // Update metric cards
+        document.getElementById('totalSales').textContent = RestaurantUtils.formatCurrency(salesData.totalSales || 0);
+        document.getElementById('ordersCount').textContent = salesData.ordersCount || 0;
+        document.getElementById('avgOrder').textContent = RestaurantUtils.formatCurrency(salesData.avgOrderValue || 0);
+        document.getElementById('totalItemsSold').textContent = salesData.totalItemsSold || 0;
+
+        // Update period label
+        const reportPeriodLabel = document.getElementById('reportPeriodLabel');
+        if (reportPeriodLabel) {
+            reportPeriodLabel.textContent = periodLabel;
+        }
+
+        // Update popular items and time breakdown
+        this.updatePopularItems(salesData.popularItems || []);
+        this.updateTimeBreakdown(salesData.timeBreakdown || [], salesData.period || 'custom');
+
+        // Update time breakdown title
+        const timeBreakdownTitle = document.getElementById('timeBreakdownTitle');
+        if (timeBreakdownTitle) {
+            const titleText = salesData.period === 'custom' ? 'Sales Breakdown' : {
+                'today': 'Sales by Hour',
+                'week': 'Sales by Day',
+                'month': 'Sales by Date'
+            }[salesData.period] || 'Sales Breakdown';
+            timeBreakdownTitle.textContent = titleText;
+        }
+    }
+
+    /**
+     * Export report with enhanced options
      */
     async exportReport() {
         try {
             const period = document.getElementById('reportPeriod')?.value || 'today';
 
+            let exportOptions = { period };
+
+            // Handle custom date range
+            if (period === 'custom') {
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+
+                if (!startDate || !endDate) {
+                    this.showNotification('Please select date range first', 'warning');
+                    return;
+                }
+
+                exportOptions = {
+                    period: 'custom',
+                    startDate,
+                    endDate
+                };
+            }
+
             this.showLoading('Exporting report...');
 
-            await restaurantAPI.exportData('csv', { period });
+            const result = await restaurantAPI.exportData('csv', exportOptions);
 
             this.hideLoading();
-            this.showNotification('Report exported successfully', 'success');
+            this.showNotification(`Report exported: ${result.filename}`, 'success');
 
         } catch (error) {
             console.error('Error exporting report:', error);
